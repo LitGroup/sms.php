@@ -10,6 +10,11 @@
 
 namespace LitGroup\Sms;
 
+/**
+ * Message.
+ *
+ * @author Roman Shamritskiy <roman@litgroup.ru>
+ */
 class Message
 {
     /**
@@ -20,7 +25,7 @@ class Message
     /**
      * @var string[]
      */
-    private $receivers;
+    private $recipients;
 
     /**
      * @var string
@@ -28,25 +33,59 @@ class Message
     private $body;
 
 
-    public function __construct($body, array $receivers, $sender = null)
+    /**
+     * Message constructor.
+     *
+     * @param string $body Text of message (UTF-8 string).
+     * @param array $recipients List of phone numbers of recipients. Phone number should be in the format
+     *                          "+7000123456789" or "7000123456789".
+     * @param null $sender      Identifier of sender. (For example "MyCompany"). Identifier should be allowed by
+     *                          SMS-Gateway provider.
+     */
+    public function __construct($body, array $recipients, $sender = null)
     {
         $this->body = $body;
-        $this->$receivers = array_values($receivers);
+        $this->recipients = array_values($recipients);
         $this->sender = $sender;
     }
 
+    /**
+     * Returns the name of sender.
+     *
+     * @return string|null
+     */
     public function getSender()
     {
         return $this->sender;
     }
 
-    public function getReceivers()
+    /**
+     * Returns list of phone number of recipients.
+     *
+     * @return string[]
+     */
+    public function getRecipients()
     {
-        return $this->receivers;
+        return $this->recipients;
     }
 
+    /**
+     * Returns the body of message.
+     *
+     * @return string
+     */
     public function getBody()
     {
         return $this->body;
+    }
+
+    /**
+     * Returns the length of the body in characters.
+     *
+     * @return integer
+     */
+    public function getLength()
+    {
+        return mb_strlen($this->getBody(), 'UTF-8');
     }
 }
