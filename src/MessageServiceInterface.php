@@ -10,7 +10,19 @@
 
 namespace LitGroup\Sms;
 
+/**
+ * Interface MessageServiceInterface.
+ *
+ * @author Roman Shamritskiy <roman@litgroup.ru>
+ */
 interface MessageServiceInterface
 {
+    /**
+     * Sends single message.
+     *
+     * @param Message $message
+     *
+     * @return void
+     */
     public function sendMessage(Message $message);
 }
