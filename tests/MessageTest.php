@@ -29,4 +29,13 @@ class MessageTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame($length, $message->getLength());
     }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage List of recipients cannot be empty.
+     */
+    public function testEmptyRecipientsList()
+    {
+        new Message('Hello', []);
+    }
 }
