@@ -10,9 +10,12 @@
 
 namespace LitGroup\Sms\Exception;
 
-use Exception;
-
-abstract class MessageServiceException extends Exception
+/**
+ * Class GatewayException
+ *
+ * @author Roman Shamritskiy <roman@litgroup.r u>
+ */
+class GatewayException extends \Exception
 {
 
 }

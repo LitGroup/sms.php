@@ -8,26 +8,26 @@
  * with this source code in the file LICENSE.
  */
 
-namespace LitGroup\Sms;
+namespace LitGroup\Sms\Gateway;
 
 use LitGroup\Sms\Exception\GatewayException;
+use LitGroup\Sms\Message;
 
 /**
- * Interface MessageServiceInterface.
+ * Interface should be implemented for a some vendor of SMS-gateway.
  *
  * @author Roman Shamritskiy <roman@litgroup.ru>
  */
-interface MessageServiceInterface
+interface GatewayInterface
 {
     /**
-     * Sends single message.
+     * Sends message.
      *
-     * @param Message $message
+     * @param Message $message It is expected that the facility has verified and contains correct information.
      *
      * @return void
      *
-     * @throws GatewayException          If gateway cannot send the message.
-     * @throws \InvalidArgumentException If message body is empty or list of recipients is empty or invalid.
+     * @throws GatewayException
      */
     public function sendMessage(Message $message);
 }

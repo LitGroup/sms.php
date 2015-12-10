@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Sms;
+namespace Tests\LitGroup\Sms;
 
 use LitGroup\Sms\Message;
 
@@ -28,14 +28,5 @@ class MessageTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($sender, $message->getSender());
 
         $this->assertSame($length, $message->getLength());
-    }
-
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage List of recipients cannot be empty.
-     */
-    public function testEmptyRecipientsList()
-    {
-        new Message('Hello', []);
     }
 }

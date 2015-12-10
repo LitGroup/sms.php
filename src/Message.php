@@ -41,17 +41,10 @@ class Message
      *                          "+7000123456789" or "7000123456789".
      * @param null $sender      Identifier of sender. (For example "MyCompany"). Identifier should be allowed by
      *                          SMS-Gateway provider.
-     *
-     * @throws \InvalidArgumentException If list of recipients is empty.
      */
     public function __construct($body, array $recipients, $sender = null)
     {
         $this->body = $body;
-
-        if (count($recipients) === 0) {
-            throw new \InvalidArgumentException('List of recipients cannot be empty.');
-        }
-
         $this->recipients = array_values($recipients);
         $this->sender = $sender;
     }
