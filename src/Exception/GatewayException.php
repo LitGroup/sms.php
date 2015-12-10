@@ -17,5 +17,4 @@ namespace LitGroup\Sms\Exception;
  */
 class GatewayException extends \Exception
 {
-
 }
