@@ -14,16 +14,13 @@ use LitGroup\Sms\Exception\GatewayException;
 use LitGroup\Sms\Gateway\GatewayInterface;
 use LitGroup\Sms\Message;
 use LitGroup\Sms\MessageService;
+use Tests\LitGroup\Sms\Log\TestLogger;
 
 class MessageServiceTest extends \PHPUnit_Framework_TestCase
 {
-    const RECIPIENT_1 = '+79991234567';
-    const RECIPIENT_1_CANONICAL = '79991234567';
-
-    const RECIPIENT_2 = '76661234567';
-    const RECIPIENT_2_CANONICAL = '76661234567';
-
-    const MESSAGE_BODY = 'Welcome';
+    const MESSAGE_BODY = 'How are you?';
+    const RECIPIENT_1 = '+71112223344';
+    const RECIPIENT_2 = '+72223334455';
     const SENDER = 'LitGroup';
 
     /**
@@ -36,28 +33,53 @@ class MessageServiceTest extends \PHPUnit_Framework_TestCase
      */
     private $gateway;
 
+    /**
+     * @var TestLogger
+     */
+    private $logger;
+
 
     protected function setUp()
     {
         $this->gateway = $this->getMock(GatewayInterface::class);
+        $this->logger = new TestLogger();
         $this->messageService = new MessageService($this->gateway);
+        $this->messageService->setLogger($this->logger);
     }
 
     protected function tearDown()
     {
-        $this->gateway = null;
         $this->messageService = null;
+        $this->gateway = null;
+        $this->logger = null;
+    }
+
+    public function testCreateMessage()
+    {
+        $this->assertInstanceOf(Message::class, $this->messageService->createMessage());
+    }
+
+    public function testSendMessage()
+    {
+        $message = $this->getMessage();
+
+        $this->gateway
+            ->expects($this->once())
+            ->method('sendMessage')
+            ->with($this->identicalTo($message));
+
+        $this->messageService->sendMessage($message);
+
+        $this->assertCount(1, $this->logger->getInfos());
     }
 
     public function getSendMessageWithInvalidMessageTests()
     {
         return [
-            [new Message(null, [self::RECIPIENT_1])],
+            [new Message()],
             [new Message('', [self::RECIPIENT_1])],
             [new Message('  ', [self::RECIPIENT_1])],
-
-            [new Message(self::MESSAGE_BODY, [])],
-            [new Message(self::MESSAGE_BODY, ['not a phone number'])],
+            [new Message(self::MESSAGE_BODY)],
         ];
     }
 
@@ -75,59 +97,30 @@ class MessageServiceTest extends \PHPUnit_Framework_TestCase
         $this->messageService->sendMessage($message);
     }
 
-    public function testSendMessage()
-    {
-        $message = new Message(
-            self::MESSAGE_BODY,
-            [
-                self::RECIPIENT_1,
-                self::RECIPIENT_1,
-                self::RECIPIENT_1,
-                self::RECIPIENT_2,
-                self::RECIPIENT_2,
-            ],
-            self::SENDER
-        );
-
-        $this->gateway
-            ->expects($this->once())
-            ->method('sendMessage')
-            ->with(
-                $this->equalTo(
-                    new Message(
-                        self::MESSAGE_BODY,
-                        [
-                            self::RECIPIENT_1_CANONICAL,
-                            self::RECIPIENT_2_CANONICAL],
-                        self::SENDER
-                    )
-                )
-            );
-
-        $this->messageService->sendMessage($message);
-    }
-
     /**
      * @expectedException \LitGroup\Sms\Exception\GatewayException
      */
-    public function testSendMessageWhenGatewayThrowsAnException()
+    public function testSendMessage_GatewayThrowsException()
     {
-        $message = new Message(self::MESSAGE_BODY, [self::RECIPIENT_1]);
-
         $this->gateway
             ->expects($this->once())
             ->method('sendMessage')
-            ->with($this->anything())
             ->willThrowException(new GatewayException());
 
-        $this->messageService->sendMessage($message);
+        $this->messageService->sendMessage($this->getMessage());
+
+        $this->assertCount(1, $this->logger->getAlerts());
     }
 
     /**
-     * @return GatewayException|\PHPUnit_Framework_MockObject_MockObject
+     * @return Message
      */
-    private function getMockForGatewayException()
+    private function getMessage()
     {
-        return $this->getMock(GatewayException::class, [], [], '', false, false);
+        return (new Message())
+            ->setBody(self::MESSAGE_BODY)
+            ->addRecipient(self::RECIPIENT_1)
+            ->addRecipient(self::RECIPIENT_2)
+            ->setSender(self::SENDER);
     }
 }

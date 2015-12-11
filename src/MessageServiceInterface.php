@@ -20,14 +20,21 @@ use LitGroup\Sms\Exception\GatewayException;
 interface MessageServiceInterface
 {
     /**
+     * Returns new instance of Message.
+     *
+     * @return Message
+     */
+    public function createMessage();
+
+    /**
      * Sends single message.
      *
      * @param Message $message
      *
      * @return void
      *
-     * @throws GatewayException          If gateway cannot send the message.
-     * @throws \InvalidArgumentException If message body is empty or list of recipients is empty or invalid.
+     * @throws GatewayException          If gateway problem occurred.
+     * @throws \InvalidArgumentException If required message fields are not fully filled.
      */
     public function sendMessage(Message $message);
 }

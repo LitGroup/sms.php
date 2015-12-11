@@ -28,8 +28,8 @@ class SmscGatewayTest extends \PHPUnit_Framework_TestCase
     const TIMEOUT = 20.0;
 
     const MESSAGE_BODY = 'I came to the world!';
-    const RECIPIENT_1 = '79991112233';
-    const RECIPIENT_2 = '79994445566';
+    const RECIPIENT_1 = '+79991112233';
+    const RECIPIENT_2 = '+79994445566';
     const SENDER = 'LitGroup';
 
     const FORM_PHONES = '+79991112233,+79994445566';

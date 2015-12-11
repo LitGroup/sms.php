@@ -42,21 +42,85 @@ class Message
      * @param null $sender      Identifier of sender. (For example "MyCompany"). Identifier should be allowed by
      *                          SMS-Gateway provider.
      */
-    public function __construct($body, array $recipients, $sender = null)
+    public function __construct($body = null, array $recipients = [], $sender = null)
     {
-        $this->body = $body;
-        $this->recipients = array_values($recipients);
-        $this->sender = $sender;
+        $this
+            ->setBody($body)
+            ->setRecipients($recipients)
+            ->setSender($sender);
     }
 
     /**
-     * Returns the name of sender.
+     * Sets the message body.
      *
-     * @return string|null
+     * @param string $body
+     *
+     * @return $this
      */
-    public function getSender()
+    public function setBody($body)
     {
-        return $this->sender;
+        $this->body = $body;
+
+        return $this;
+    }
+
+    /**
+     * Returns the message body.
+     *
+     * @return string
+     */
+    public function getBody()
+    {
+        return $this->body;
+    }
+
+    /**
+     * Returns the length of the message body in characters.
+     *
+     * @return integer
+     */
+    public function getLength()
+    {
+        return mb_strlen($this->getBody(), 'UTF-8');
+    }
+
+    /**
+     * Adds recipient.
+     *
+     * @param string $recipient A phone number in the one of formats: "+71234567890" or "71234567890".
+     *
+     * @return $this
+     *
+     * @throws \InvalidArgumentException If $recipient is not a string or format is invalid.
+     */
+    public function addRecipient($recipient)
+    {
+        array_push(
+            $this->recipients,
+            $this->canonicalizeRecipient($recipient)
+        );
+
+        return $this;
+    }
+
+    /**
+     * Sets/replaces list of recipients.
+     *
+     * @param string[] $recipients A list of phone numbers in the one of formats: "+71234567890" or "71234567890".
+     *
+     * @return $this
+     *
+     * @throws \InvalidArgumentException If one of recipients is not a string or format is invalid.
+     */
+    public function setRecipients(array $recipients)
+    {
+        $this->recipients = [];
+
+        foreach ($recipients as $recipient) {
+            $this->addRecipient($recipient);
+        }
+
+        return $this;
     }
 
     /**
@@ -70,22 +134,53 @@ class Message
     }
 
     /**
-     * Returns the body of message.
+     * Sets the name of sender.
      *
-     * @return string
+     * @param string $sender
+     *
+     * @return $this
      */
-    public function getBody()
+    public function setSender($sender)
     {
-        return $this->body;
+        $this->sender = $sender;
+
+        return $this;
     }
 
     /**
-     * Returns the length of the body in characters.
+     * Returns the name of sender.
      *
-     * @return integer
+     * @return string|null
      */
-    public function getLength()
+    public function getSender()
     {
-        return mb_strlen($this->getBody(), 'UTF-8');
+        return $this->sender;
+    }
+
+    /**
+     * @param string $recipient
+     *
+     * @return string
+     *
+     * @throws \InvalidArgumentException If $recipient is not a string or format is invalid.
+     */
+    private function canonicalizeRecipient($recipient)
+    {
+        if (!is_string($recipient)) {
+            throw new \InvalidArgumentException(
+                sprintf(
+                    'Recipient should be a string, but "%s" given.',
+                    is_object($recipient) ? get_class($recipient) : gettype($recipient)
+                )
+            );
+        }
+
+        if (preg_match('/^\+?(\d+)$/Ds', $recipient, $matches) !== 1) {
+            throw new \InvalidArgumentException(
+                sprintf('Invalid format of recipient. Should be a string like "+71234567890" or "71234567890"')
+            );
+        }
+
+        return "+${matches[1]}";
     }
 }

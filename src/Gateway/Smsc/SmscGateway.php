@@ -155,7 +155,7 @@ class SmscGateway implements GatewayInterface
      */
     private function preparePhoneNumbers(array $numbers)
     {
-        return '+' . implode(',+', $numbers);
+        return implode(',', $numbers);
     }
 
     /**
