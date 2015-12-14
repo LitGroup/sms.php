@@ -15,6 +15,13 @@ Available gateway services
 
 * `SmscGateway` — https://smsc.ru
 
+Installation
+------------
+
+```
+composer require litgroup/sms=~0.2
+```
+
 Example of usage
 ----------------
 
