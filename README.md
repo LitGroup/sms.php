@@ -3,6 +3,13 @@ SMS
 
 > Short messaging library for PHP.
 
+[![Version](https://img.shields.io/packagist/v/litgroup/sms.svg)](https://packagist.org/packages/litgroup/sms)
+[![Dev Version](https://img.shields.io/packagist/vpre/litgroup/sms.svg)](https://packagist.org/packages/litgroup/sms)
+[![Downloads](https://img.shields.io/packagist/dt/litgroup/sms.svg)](https://packagist.org/packages/litgroup/sms)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/LitGroup/sms.php/blob/master/LICENSE)
+[![Build Status](https://travis-ci.org/LitGroup/sms.php.svg?branch=master)](https://travis-ci.org/LitGroup/sms.php)
+
+
 Available gateway services
 --------------------------
 
