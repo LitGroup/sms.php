@@ -10,35 +10,35 @@
 
 namespace Tests\LitGroup\Sms\Gateway\Smsc;
 
-use GuzzleHttp\ClientInterface;
+use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\Exception\SeekException;
+use GuzzleHttp\Exception\TransferException;
+use GuzzleHttp\Handler\MockHandler;
+use GuzzleHttp\HandlerStack;
+use GuzzleHttp\Middleware;
+use GuzzleHttp\Psr7\Response;
+use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\RequestOptions;
-use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\StreamInterface;
 use LitGroup\Sms\Gateway\Smsc\SmscGateway;
 use LitGroup\Sms\Message;
 
 class SmscGatewayTest extends \PHPUnit_Framework_TestCase
 {
-    const API_ENTRY_POINT = 'https://smsc.ru/sys/send.php';
-    const LOGIN = 'superman';
-    const PASSWORD = 'krypton';
-    const PASSWORD_HASH = 'b785359bf4145b24762ff6940144a24f';
-    const CONNECT_TIMEOUT = 10.0;
-    const TIMEOUT = 20.0;
+    const SMSC_LOGIN = 'mylogin';
+    const SMSC_PASS = 'mypassword';
+    const SMSC_PASS_MD5 = '34819d7beeabb9260a5c854bc85b3e44';
 
-    const MESSAGE_BODY = 'I came to the world!';
-    const RECIPIENT_1 = '+79991112233';
-    const RECIPIENT_2 = '+79994445566';
-    const SENDER = 'LitGroup';
+    const SMSC_API_ENTRY_POINT = 'https://smsc.ru/sys/send.php';
 
-    const FORM_PHONES = '+79991112233,+79994445566';
-    const FORM_CHARSET = 'utf-8';
-    const FORM_FORMAT = 3;
+    const MESSAGE_BODY = 'How are you?';
+    const MESSAGE_RECIPIENT_1 = '+71111234567890';
+    const MESSAGE_RECIPIENT_2 = '+72221234567890';
+    const MESSAGE_SENDER = 'LitGroup';
 
-    const SUCCESS_JSON = '{"id": 99, "cnt": 2}';
+    const HTTP_CONN_TIMEOUT = 10.0;
+    const HTTP_TIMEOUT = 20.0;
 
-    const ERROR_JSON = '{"error": "error_msg", "error_code": 666}';
 
     /**
      * @var SmscGateway
@@ -46,20 +46,39 @@ class SmscGatewayTest extends \PHPUnit_Framework_TestCase
     private $gateway;
 
     /**
-     * @var ClientInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @var Client
      */
     private $httpClient;
+
+    /**
+     * @var MockHandler
+     */
+    private $httpMockHandler;
+
+    /**
+     * @var array
+     */
+    private $httpContainer;
 
 
     protected function setUp()
     {
-        $this->httpClient = $this->getMock(ClientInterface::class);
+        $this->httpContainer = [];
+        $this->httpMockHandler = new MockHandler();
+
+        $handler = HandlerStack::create($this->httpMockHandler);
+        $handler->push(Middleware::history($this->httpContainer));
+
+        $this->httpClient = new Client([
+            'handler' => $handler
+        ]);
+
         $this->gateway = new SmscGateway(
-            self::LOGIN,
-            self::PASSWORD,
+            self::SMSC_LOGIN,
+            self::SMSC_PASS,
             $this->httpClient,
-            self::CONNECT_TIMEOUT,
-            self::TIMEOUT
+            self::HTTP_CONN_TIMEOUT,
+            self::HTTP_TIMEOUT
         );
     }
 
@@ -67,13 +86,15 @@ class SmscGatewayTest extends \PHPUnit_Framework_TestCase
     {
         $this->gateway = null;
         $this->httpClient = null;
+        $this->httpMockHandler = null;
+        $this->httpContainer = null;
     }
 
     public function getSendMessageTests()
     {
         return [
-            [new Message(self::MESSAGE_BODY, [self::RECIPIENT_1, self::RECIPIENT_2])],
-            [new Message(self::MESSAGE_BODY, [self::RECIPIENT_1, self::RECIPIENT_2], self::SENDER)],
+            [$this->getMessage()],
+            [$this->getMessage()->setSender(null)],
         ];
     }
 
@@ -82,133 +103,94 @@ class SmscGatewayTest extends \PHPUnit_Framework_TestCase
      */
     public function testSendMessage(Message $message)
     {
-        $this->httpClient
-            ->expects($this->once())
-            ->method('request')
-            ->with(
-                $this->anything(),
-                $this->anything(),
-                $this->anything()
+        $this->httpMockHandler->append(
+            new Response(
+                200,
+                ['Content-Type' => 'application/json'],
+                '{"id": 123, "cnt": 1}'
             )
-            ->willReturnCallback(function ($method, $url, $options) use ($message) {
-                $this->assertSame('POST', $method);
-                $this->assertSame(self::API_ENTRY_POINT, $url);
+        );
 
-                $this->assertArrayHasKey(RequestOptions::CONNECT_TIMEOUT, $options);
-                $this->assertEquals(self::CONNECT_TIMEOUT, $options[RequestOptions::CONNECT_TIMEOUT], '', 0.1);
-
-                $this->assertArrayHasKey(RequestOptions::TIMEOUT, $options);
-                $this->assertEquals(self::TIMEOUT, $options[RequestOptions::TIMEOUT], '', 0.1);
-
-                $this->assertArrayHasKey(RequestOptions::FORM_PARAMS, $options);
-
-                $expectedParameters = [
-                    'login'   => self::LOGIN,
-                    'psw'     => self::PASSWORD_HASH,
-                    'phones'  => self::FORM_PHONES,
-                    'charset' => self::FORM_CHARSET,
-                    'mes'     => $message->getBody(),
-                    'fmt'     => self::FORM_FORMAT,
-                ];
-
-                if ($message->getSender()) {
-                    $expectedParameters['sender'] = $message->getSender();
-                }
-
-                $this->assertEquals($expectedParameters, $options[RequestOptions::FORM_PARAMS]);
-
-                return $this->getMockForHttpResponse(200, self::SUCCESS_JSON);
-            });
-
+        // Sending message:
         $this->gateway->sendMessage($message);
+
+        $this->assertHttpRequestsCount(1);
+
+        $this->assertEquals(self::HTTP_CONN_TIMEOUT, $this->httpContainer[0]['options'][RequestOptions::CONNECT_TIMEOUT]);
+        $this->assertEquals(self::HTTP_TIMEOUT, $this->httpContainer[0]['options'][RequestOptions::TIMEOUT]);
+
+        $request = $this->getHttpRequest(0);
+        $this->assertSame('POST', $request->getMethod());
+        $this->assertSame(self::SMSC_API_ENTRY_POINT, (string) $request->getUri());
+        $this->assertEquals(
+            $this->getRequestBody($message),
+            (string) $request->getBody()
+        );
     }
 
     /**
-     * @expectedException \LitGroup\Sms\Exception\GatewayException
-     */
-    public function testSendMessage_ResponseStatusNot200()
-    {
-        $this->httpClient
-            ->expects($this->once())
-            ->method('request')
-            ->willReturn($this->getMockForHttpResponse(500, ''));
-
-        $this->gateway->sendMessage($this->getMessage());
-    }
-
-    /**
-     * @expectedException \LitGroup\Sms\Exception\GatewayException
-     * @expectedExceptionMessage error_msg
-     * @expectedExceptionCode 666
+     * @expectedException \LitGroup\Sms\Exception\GatewayErrorResponseException
      */
     public function testSendMessage_ErrorResponse()
     {
-        $this->httpClient
-            ->expects($this->once())
-            ->method('request')
-            ->willReturn($this->getMockForHttpResponse(200, self::ERROR_JSON));
+        $this->httpMockHandler->append(
+            new Response(
+                200,
+                ['Content-Type' => 'application/json'],
+                '{"error": "some error message", "error_code": 999, "id": 123}'
+            )
+        );
 
         $this->gateway->sendMessage($this->getMessage());
     }
 
     /**
-     * @expectedException \LitGroup\Sms\Exception\GatewayException
+     * @expectedException \LitGroup\Sms\Exception\GatewayUnavailableException
      */
-    public function testSendMessage_ResponseWithInvalidJson()
+    public function testSendMessage_UnexpectedResponseStatus()
     {
-        $this->httpClient
-            ->expects($this->once())
-            ->method('request')
-            ->willReturn($this->getMockForHttpResponse(200, 'invalid json'));
+        $this->httpMockHandler->append(
+            new Response(204)
+        );
 
         $this->gateway->sendMessage($this->getMessage());
     }
 
     /**
-     * @expectedException \LitGroup\Sms\Exception\GatewayException
+     * @expectedException \LitGroup\Sms\Exception\GatewayUnavailableException
      */
-    public function testSendMessage_GuzzleException()
+    public function testSendMessage_InvalidResponseFormat()
     {
-        $this->httpClient
-            ->expects($this->once())
-            ->method('request')
-            ->willThrowException($this->getMock(RequestException::class, [], [], '', false, false));
+        $this->httpMockHandler->append(
+            new Response(
+                200,
+                ['Content-Type' => 'application/json'],
+                'invalid json'
+            )
+        );
 
         $this->gateway->sendMessage($this->getMessage());
     }
 
-    /**
-     * @return ResponseInterface|\PHPUnit_Framework_MockObject_MockObject
-     */
-    private function getMockForHttpResponse($statusCode, $body)
+    public function getSendMessage_HttpException_tests()
     {
-        $response = $this->getMock(ResponseInterface::class);
-
-        $response
-            ->expects($this->any())
-            ->method('getStatusCode')
-            ->willReturn($statusCode);
-        $response
-            ->expects($this->any())
-            ->method('getBody')
-            ->willReturn($this->getMockForStream($body));
-
-        return $response;
+        return [
+            [$this->getMock(RequestException::class, [], [], '', false, false)],
+            [$this->getMock(TransferException::class, [], [], '', false, false)],
+            [$this->getMock(SeekException::class, [], [], '', false, false)],
+        ];
     }
 
     /**
-     * @return StreamInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @dataProvider getSendMessage_HttpException_tests
+     *
+     * @expectedException \LitGroup\Sms\Exception\GatewayTransferException
      */
-    private function getMockForStream($body)
+    public function testSendMessage_HttpException($exception)
     {
-        $stream = $this->getMock(StreamInterface::class);
+        $this->httpMockHandler->append($exception);
 
-        $stream
-            ->expects($this->any())
-            ->method('__toString')
-            ->willReturn($body);
-
-        return $stream;
+        $this->gateway->sendMessage($this->getMessage());
     }
 
     /**
@@ -216,6 +198,62 @@ class SmscGatewayTest extends \PHPUnit_Framework_TestCase
      */
     private function getMessage()
     {
-        return new Message(self::MESSAGE_BODY, [self::RECIPIENT_1, self::RECIPIENT_2], self::SENDER);
+        return new Message(
+            self::MESSAGE_BODY,
+            [
+                self::MESSAGE_RECIPIENT_1,
+                self::MESSAGE_RECIPIENT_2
+            ],
+            self::MESSAGE_SENDER
+        );
+    }
+
+    /**
+     * @param integer $id
+     *
+     * @return Request
+     */
+    private function getHttpRequest($id)
+    {
+        return $this->httpContainer[$id]['request'];
+    }
+
+    /**
+     * @param integer $count
+     */
+    private function assertHttpRequestsCount($count)
+    {
+        $this->assertCount($count, $this->httpContainer);
+    }
+
+    /**
+     * @param Message $message
+     *
+     * @return string
+     */
+    private function getRequestBody(Message $message)
+    {
+        $params = [
+            'login'   => self::SMSC_LOGIN,
+            'psw'     => self::SMSC_PASS_MD5,
+            'phones'  => implode(',', $message->getRecipients()),
+            'charset' => 'utf-8',
+            'mes'     => $message->getBody(),
+            'fmt'     => SmscGateway::SMSC_API_RESPONSE_FORMAT,
+        ];
+
+        if ($message->getSender() !== null) {
+            $params['sender'] = $message->getSender();
+        }
+
+        $pairs = [];
+        foreach ($params as $k => $v) {
+            array_push(
+                $pairs,
+                sprintf('%s=%s', $k, urlencode($v))
+            );
+        }
+
+        return implode('&', $pairs);
     }
 }

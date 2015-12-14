@@ -10,6 +10,9 @@
 
 namespace LitGroup\Sms\Gateway\Smsc;
 
+use LitGroup\Sms\Exception\GatewayErrorResponseException;
+use LitGroup\Sms\Exception\GatewayTransferException;
+use LitGroup\Sms\Exception\GatewayUnavailableException;
 use LitGroup\Sms\Message;
 use LitGroup\Sms\Gateway\GatewayInterface;
 use LitGroup\Sms\Exception\GatewayException;
@@ -116,17 +119,17 @@ class SmscGateway implements GatewayInterface
             ]);
 
             if ($httpResponse->getStatusCode() !== 200) {
-                throw new GatewayException('Unknown error.');
+                throw new GatewayUnavailableException('Unexpected response status.');
             }
 
             $response = $this->unserializeResponse((string) $httpResponse->getBody());
 
             if (array_key_exists('error', $response)) {
-                throw new GatewayException($response['error'], $response['error_code']);
+                throw new GatewayErrorResponseException($response['error'], (int) $response['error_code']);
             }
 
         } catch (GuzzleException $e) {
-            throw new GatewayException(sprintf('HTTP Connection problem: "%s"', $e->getMessage()), 0, $e);
+            throw new GatewayTransferException($e->getMessage(), $e);
         }
     }
 
@@ -168,7 +171,7 @@ class SmscGateway implements GatewayInterface
     {
         $response = json_decode($responseBody, true);
         if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new GatewayException('Invalid response format.');
+            throw new GatewayUnavailableException('Invalid response format.');
         }
 
         return $response;

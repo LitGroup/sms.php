@@ -11,10 +11,10 @@
 namespace LitGroup\Sms\Exception;
 
 /**
- * Class GatewayException
+ * Class GatewayUnavailableException
  *
- * @author Roman Shamritskiy <roman@litgroup.r u>
+ * @author Roman Shamritskiy <roman@litgroup.ru>
  */
-abstract class GatewayException extends \RuntimeException implements SmsExceptionInterface
+class GatewayUnavailableException extends GatewayException
 {
 }

@@ -105,7 +105,7 @@ class MessageServiceTest extends \PHPUnit_Framework_TestCase
         $this->gateway
             ->expects($this->once())
             ->method('sendMessage')
-            ->willThrowException(new GatewayException());
+            ->willThrowException($this->getMockForAbstractClass(GatewayException::class, [], '', false, false));
 
         $this->messageService->sendMessage($this->getMessage());
 
