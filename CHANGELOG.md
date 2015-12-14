@@ -1,6 +1,10 @@
 CHANGELOG
 =========
 
+v0.2.1
+------
+- `MessageService` logger messages changed.
+
 v0.2.0
 ------
 - Added clarifying exceptions.

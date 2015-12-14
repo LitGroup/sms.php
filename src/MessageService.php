@@ -61,7 +61,7 @@ class MessageService implements MessageServiceInterface, LoggerAwareInterface
         try {
             $this->gateway->sendMessage($message);
 
-            $this->logger->info('[SMS] Message was sent.', [
+            $this->logger->info('Message (SMS) was sent.', [
                 'message' => [
                     'body'       => $message->getBody(),
                     'recipients' => $message->getRecipients(),
@@ -69,7 +69,7 @@ class MessageService implements MessageServiceInterface, LoggerAwareInterface
                 ]
             ]);
         } catch (GatewayException $e) {
-            $this->logger->alert('[SMS] SMS Gateway problem occurred.', [
+            $this->logger->alert('SMS Gateway problem occurred.', [
                 'exception' => $e
             ]);
 
