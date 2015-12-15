@@ -6,7 +6,6 @@ v0.4.0
 - Added `MessageLoggerInterface`.
 - (BC) `MessageServiceInterface::setMessageLogger` was added.
 
-
 v0.3.0
 ------
 - Added `NullGateway` for development purposes.
