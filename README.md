@@ -19,7 +19,7 @@ Installation
 ------------
 
 ```
-composer require litgroup/sms=~0.2
+composer require litgroup/sms=~0.3
 ```
 
 Example of usage
