@@ -8,24 +8,23 @@
  * with this source code in the file LICENSE.
  */
 
-namespace LitGroup\Sms\Gateway;
+namespace LitGroup\Sms\Logger;
 
 use LitGroup\Sms\Message;
 
 /**
- * NullGateway usable for development.
+ * MessageLoggerInterface.
  *
  * @author Roman Shamritskiy <roman@litgroup.ru>
- *
- * @codeCoverageIgnore
  */
-class NullGateway implements GatewayInterface
+interface MessageLoggerInterface
 {
     /**
-     * @inheritDoc
+     * Adds message into the log.
+     *
+     * @param Message $message
+     *
+     * @return void
      */
-    public function sendMessage(Message $message)
-    {
-        // Nothing to do. It's a null-object.
-    }
+    public function addMessage(Message $message);
 }
