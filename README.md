@@ -15,6 +15,7 @@ Available gateway services
 
 * `SmscGateway` — https://smsc.ru
 
+
 Installation
 ------------
 
@@ -22,8 +23,11 @@ Installation
 composer require litgroup/sms=~0.3
 ```
 
+
 Example of usage
 ----------------
+
+### Message sending
 
 ```php
 use LitGroup\Sms\Message;
@@ -48,4 +52,33 @@ $message
 // Send a message.
 $messageService->sendMessage($message);
 
+```
+
+
+### Message logging
+
+All sent messages can be logged. You can implement own custom logger which can store all sent messages in a database.
+Logger must implement `LitGroup\Sms\Logger\MessageLoggerInterface` and must be injected into the message service
+by calling `MessageServiceInterface::setMessageLogger()`.
+
+Package provides default implementation `LitGroup\Sms\Logger\MessageLogger` which can be used for testing purposes.
+
+**Example:**
+
+```php
+use LitGroup\Sms\Logging\MessageLogger;
+// ...
+
+$logger = new MessageLogger();
+
+/** @var MessageService $messageService */
+$messageService->setMessageLogger($logger);
+
+// Sending of messages...
+
+// Get all sent messages:
+$logger->getMessages();
+
+// Get number of sent messages:
+$logger->count();
 ```

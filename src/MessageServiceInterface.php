@@ -11,6 +11,7 @@
 namespace LitGroup\Sms;
 
 use LitGroup\Sms\Exception\GatewayException;
+use LitGroup\Sms\Logger\MessageLoggerInterface;
 
 /**
  * Interface MessageServiceInterface.
@@ -37,4 +38,15 @@ interface MessageServiceInterface
      * @throws \InvalidArgumentException If required message fields are not fully filled.
      */
     public function sendMessage(Message $message);
+
+    /**
+     * Sets message logger.
+     *
+     * All successfully sent messages will be logged in a given logger.
+     *
+     * @param MessageLoggerInterface $messageLogger
+     *
+     * @return void
+     */
+    public function setMessageLogger(MessageLoggerInterface $messageLogger);
 }

@@ -12,6 +12,8 @@ namespace LitGroup\Sms;
 
 use LitGroup\Sms\Exception\GatewayException;
 use LitGroup\Sms\Gateway\GatewayInterface;
+use LitGroup\Sms\Logger\MessageLoggerInterface;
+use LitGroup\Sms\Logger\NullMessageLogger;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
@@ -29,6 +31,11 @@ class MessageService implements MessageServiceInterface, LoggerAwareInterface
     private $gateway;
 
     /**
+     * @var MessageLoggerInterface
+     */
+    private $messageLogger;
+
+    /**
      * @var LoggerInterface
      */
     private $logger;
@@ -40,6 +47,7 @@ class MessageService implements MessageServiceInterface, LoggerAwareInterface
     public function __construct(GatewayInterface $gateway)
     {
         $this->gateway = $gateway;
+        $this->messageLogger = new NullMessageLogger();
         $this->logger = new NullLogger();
     }
 
@@ -60,6 +68,7 @@ class MessageService implements MessageServiceInterface, LoggerAwareInterface
 
         try {
             $this->gateway->sendMessage($message);
+            $this->messageLogger->addMessage($message);
 
             $this->logger->info('Message (SMS) was sent.', [
                 'message' => [
@@ -78,6 +87,22 @@ class MessageService implements MessageServiceInterface, LoggerAwareInterface
     }
 
     /**
+     * @inheritDoc
+     */
+    public function setMessageLogger(MessageLoggerInterface $messageLogger)
+    {
+        $this->messageLogger = $messageLogger;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setLogger(LoggerInterface $logger)
+    {
+        $this->logger = $logger;
+    }
+
+    /**
      * @param Message $message
      *
      * @throws \InvalidArgumentException
@@ -91,13 +116,5 @@ class MessageService implements MessageServiceInterface, LoggerAwareInterface
         if (count($message->getRecipients()) === 0) {
             throw new \InvalidArgumentException('At least one recipient should be given.');
         }
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function setLogger(LoggerInterface $logger)
-    {
-        $this->logger = $logger;
     }
 }
