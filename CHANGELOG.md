@@ -1,6 +1,11 @@
 CHANGELOG
 =========
 
+v0.3.0
+------
+- Added `NullGateway` for development purposes.
+- Added `CascadeGateway`.
+
 v0.2.1
 ------
 - `MessageService` logger messages changed.

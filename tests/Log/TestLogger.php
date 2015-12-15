@@ -52,16 +52,25 @@ class TestLogger extends AbstractLogger
     /**
      * @return array[]
      */
-    public function getInfos()
+    public function getAlerts()
     {
-        return $this->getLogs(LogLevel::INFO);
+        return $this->getLogs(LogLevel::ALERT);
     }
 
     /**
      * @return array[]
      */
-    public function getAlerts()
+    public function getWarnings()
     {
-        return $this->getLogs(LogLevel::ALERT);
+        return $this->getLogs(LogLevel::WARNING);
     }
+
+    /**
+     * @return array[]
+     */
+    public function getInfos()
+    {
+        return $this->getLogs(LogLevel::INFO);
+    }
+
 }

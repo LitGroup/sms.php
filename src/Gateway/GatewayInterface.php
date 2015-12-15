@@ -11,6 +11,7 @@
 namespace LitGroup\Sms\Gateway;
 
 use LitGroup\Sms\Exception\GatewayErrorResponseException;
+use LitGroup\Sms\Exception\GatewayException;
 use LitGroup\Sms\Exception\GatewayTransferException;
 use LitGroup\Sms\Exception\GatewayUnavailableException;
 use LitGroup\Sms\Message;
@@ -29,6 +30,7 @@ interface GatewayInterface
      *
      * @return void
      *
+     * @throws GatewayException
      * @throws GatewayErrorResponseException
      * @throws GatewayUnavailableException
      * @throws GatewayTransferException
