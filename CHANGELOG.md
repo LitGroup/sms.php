@@ -1,6 +1,10 @@
 CHANGELOG
 =========
 
+v0.5.0
+------
+- Adds `MockSmsGateway` (EXPERIMENTAL, see: https://github.com/LitGroup/mock-sms-server).
+
 v0.4.0
 ------
 - Added `MessageLoggerInterface`.
