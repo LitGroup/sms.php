@@ -1,7 +1,7 @@
 SMS
 ===
 
-> Short messaging library for PHP.
+> Provider neutral SMS library for PHP 5.5+
 
 [![Version](https://img.shields.io/packagist/v/litgroup/sms.svg)](https://packagist.org/packages/litgroup/sms)
 [![Dev Version](https://img.shields.io/packagist/vpre/litgroup/sms.svg)](https://packagist.org/packages/litgroup/sms)
