@@ -1,6 +1,6 @@
 {
     "name": "litgroup/sms",
-    "description": "Platform independent short messaging library.",
+    "description": "Provider neutral short messaging library.",
     "keywords": ["sms", "short message"],
     "type": "library",
     "license": "MIT",
