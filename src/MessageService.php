@@ -2,7 +2,7 @@
 /**
  * This file is part of the "litgroup/sms" package.
  *
- * (c) LitGroup <http://litgroup.ru/>
+ * (c) Roman Shamritskiy <roman@litgroup.ru>
  *
  * This source file is subject to the MIT license that is bundled
  * with this source code in the file LICENSE.
@@ -54,18 +54,8 @@ class MessageService implements MessageServiceInterface, LoggerAwareInterface
     /**
      * @inheritDoc
      */
-    public function createMessage()
-    {
-        return new Message();
-    }
-
-    /**
-     * @inheritDoc
-     */
     public function sendMessage(Message $message)
     {
-        $this->validateMessage($message);
-
         try {
             $this->gateway->sendMessage($message);
             $this->messageLogger->addMessage($message);
@@ -100,21 +90,5 @@ class MessageService implements MessageServiceInterface, LoggerAwareInterface
     public function setLogger(LoggerInterface $logger)
     {
         $this->logger = $logger;
-    }
-
-    /**
-     * @param Message $message
-     *
-     * @throws \InvalidArgumentException
-     */
-    private function validateMessage(Message $message)
-    {
-        if ($message->getBody() === null || trim($message->getBody()) === '') {
-            throw new \InvalidArgumentException('Message body cannot be empty or contain spaces only.');
-        }
-
-        if (count($message->getRecipients()) === 0) {
-            throw new \InvalidArgumentException('At least one recipient should be given.');
-        }
     }
 }

@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <phpunit backupGlobals="false"
          backupStaticAttributes="false"
          colors="true"
@@ -12,7 +11,7 @@
          bootstrap="./vendor/autoload.php">
 
     <testsuites>
-        <testsuite name="LitGroupMailerBundle test suite">
+        <testsuite name="litgroup/sms">
             <directory suffix="Test.php">tests</directory>
         </testsuite>
     </testsuites>

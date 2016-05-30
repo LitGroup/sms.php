@@ -2,7 +2,7 @@
 /**
  * This file is part of the "litgroup/sms" package.
  *
- * (c) LitGroup <http://litgroup.ru/>
+ * (c) Roman Shamritskiy <roman@litgroup.ru>
  *
  * This source file is subject to the MIT license that is bundled
  * with this source code in the file LICENSE.
@@ -14,142 +14,141 @@ use LitGroup\Sms\Message;
 
 class MessageTest extends \PHPUnit_Framework_TestCase
 {
-    public function getTestsData()
+    const BODY = 'Hola!';
+    const BODY_LENGTH = 5;
+
+    const RECIPIENT_A = '+71231111111';
+    const RECIPIENT_B = '+71232222222';
+    const RECIPIENT_C = '+71233333333';
+
+    const SENDER = 'Company ltd.';
+
+    public function testConstructMinimal()
     {
-        return [
-            /* body, recipients, sender, length */
-            ['Hello!',        ['+79991234567', '76669999999'], ['+79991234567', '+76669999999'], null],
-            ['Hello!',        ['+79991234567', '76669999999'], ['+79991234567', '+76669999999'], 'LitGroup'],
-            ['Привет, друг!', ['+79991234567', '76669999999'], ['+79991234567', '+76669999999'], null],
-        ];
-    }
-
-    /**
-     * @dataProvider getTestsData
-     */
-    public function testConstructor($body, array $recipients, array $recipientsCanonical, $sender)
-    {
-        $message = new Message($body, $recipients, $sender);
-
-        $this->assertSame($body, $message->getBody());
-        $this->assertSame($recipientsCanonical, $message->getRecipients());
-        $this->assertSame($sender, $message->getSender());
-    }
-
-    public function testBody()
-    {
-        $message = new Message();
-        $this->assertNull($message->getBody());
-
-        $this->assertSame($message, $message->setBody('How are you?'));
-        $this->assertSame('How are you?', $message->getBody());
-    }
-
-    public function testSender()
-    {
-        $message = new Message();
-        $this->assertNull($message->getSender());
-
-        $this->assertSame($message, $message->setSender('LitGroup'));
-        $this->assertSame('LitGroup', $message->getSender());
-    }
-
-    public function getLengthTests()
-    {
-        return [
-            [0, null],
-            [0, ''],
-            [12, 'How are you?'],
-            [7, 'Как ты?'],
-        ];
-    }
-
-    /**
-     * @dataProvider getLengthTests
-     */
-    public function testLength($length, $body)
-    {
-        $message = new Message();
-        $this->assertSame(0, $message->getLength());
-
-        $message->setBody($body);
-        $this->assertSame($length, $message->getLength());
-    }
-
-    public function getRecipientsTests()
-    {
-        return [
+        $msg = new Message(
+            self::BODY,
             [
-                [
-                    '+71111234567',
-                    '72221234567',
-                    '73331234567',
-                ],
-                [
-                    '+71111234567',
-                    '+72221234567',
-                    '+73331234567',
-                ]
+                self::RECIPIENT_A,
+                self::RECIPIENT_B,
+                self::RECIPIENT_C,
             ]
-        ];
+        );
+        $this->assertSame(self::BODY, $msg->getBody());
+        $this->assertSame(
+            [
+                self::RECIPIENT_A,
+                self::RECIPIENT_B,
+                self::RECIPIENT_C,
+            ],
+            $msg->getRecipients()
+        );
+        $this->assertNull($msg->getSender());
     }
 
-    public function getInvalidRecipientsTests()
+    public function testConstructWithSender()
+    {
+        $msg = new Message(self::BODY, [self::RECIPIENT_A], self::SENDER);
+        $this->assertSame(self::BODY, $msg->getBody());
+        $this->assertSame([self::RECIPIENT_A], $msg->getRecipients());
+        $this->assertSame(self::SENDER, $msg->getSender());
+    }
+
+    public function testGetLength()
+    {
+        $msg = new Message(self::BODY, [self::RECIPIENT_A]);
+        $this->assertSame(self::BODY_LENGTH, $msg->getLength());
+    }
+
+    /**
+     * @expectedException \LitGroup\Sms\Exception\InvalidArgumentException
+     */
+    public function testBodyCannotBeNull()
+    {
+        new Message(null, [self::RECIPIENT_A]);
+    }
+
+    /**
+     * @expectedException \LitGroup\Sms\Exception\InvalidArgumentException
+     */
+    public function testBodyMustBeAString()
+    {
+        new Message(new \stdClass(), [self::RECIPIENT_A]);
+    }
+
+    /**
+     * @expectedException \LitGroup\Sms\Exception\InvalidArgumentException
+     */
+    public function testBodyCannotBeEmptyString()
+    {
+        new Message('', [self::RECIPIENT_A]);
+    }
+
+    /**
+     * @expectedException \LitGroup\Sms\Exception\InvalidArgumentException
+     */
+    public function testListOfRecipientsCannotBeEmpty()
+    {
+        new Message(self::BODY, []);
+    }
+
+    /**
+     * @expectedException \LitGroup\Sms\Exception\InvalidArgumentException
+     */
+    public function testRecipientCannotBeNull()
+    {
+        new Message(self::BODY, [null]);
+    }
+
+    /**
+     * @expectedException \LitGroup\Sms\Exception\InvalidArgumentException
+     */
+    public function testRecipientNumberMustBeAString()
+    {
+        new Message(self::BODY, [new \stdClass]);
+    }
+
+    public function getInvalidRecipientFormatTests()
     {
         return [
-            [null],
             [''],
-            ['   '],
-            ['not a number'],
-            [123456789],
+            ['1234567890'],
+            ['++123456789'],
+            ['+7 (495) 123-45-67'],
+            ['alphabetical'],
+            ['+alphabetical'],
         ];
     }
 
     /**
-     * @dataProvider getRecipientsTests
+     * @dataProvider getInvalidRecipientFormatTests
+     * @expectedException \LitGroup\Sms\Exception\InvalidArgumentException
      */
-    public function testAddRecipient($recipients, $expected)
+    public function testInvalidRecipientFormat($recipient)
     {
-        $message = new Message();
-        $this->assertSame([], $message->getRecipients());
-
-        foreach ($recipients as $recipient) {
-            $this->assertSame($message, $message->addRecipient($recipient));
-        }
-        $this->assertSame($expected, $message->getRecipients());
+        new Message(self::BODY, [$recipient]);
     }
 
     /**
-     * @dataProvider getInvalidRecipientsTests
-     * @expectedException \InvalidArgumentException
+     * @expectedException \LitGroup\Sms\Exception\InvalidArgumentException
      */
-    public function testAddRecipient_InvalidValue($recipient)
+    public function testSenderMustBeAString()
     {
-        (new Message())->addRecipient($recipient);
+        new Message(self::BODY, [self::RECIPIENT_A], new \stdClass());
     }
 
     /**
-     * @dataProvider getRecipientsTests
+     * @expectedException \LitGroup\Sms\Exception\InvalidArgumentException
      */
-    public function testSetRecipients($recipients, $expected)
+    public function testSenderCannotBenEmptyString()
     {
-        $message = new Message();
-        $message->setRecipients(['+71234567890']);
-
-        $this->assertSame($message, $message->setRecipients($recipients));
-        $this->assertSame($expected, $message->getRecipients());
-
-        $message->setRecipients([]);
-        $this->assertSame([], $message->getRecipients());
+        new Message(self::BODY, [self::RECIPIENT_A], '');
     }
 
     /**
-     * @dataProvider getInvalidRecipientsTests
-     * @expectedException \InvalidArgumentException
+     * @expectedException \LitGroup\Sms\Exception\InvalidArgumentException
      */
-    public function testSetRecipients_InvalidValue($recipient)
+    public function testSenderCannotContainWhitespaceOnlyCharacters()
     {
-        (new Message())->setRecipients([$recipient]);
+        new Message(self::BODY, [self::RECIPIENT_A], '      ');
     }
-
 }

@@ -2,7 +2,7 @@
 /**
  * This file is part of the "litgroup/sms" package.
  *
- * (c) LitGroup <http://litgroup.ru/>
+ * (c) Roman Shamritskiy <roman@litgroup.ru>
  *
  * This source file is subject to the MIT license that is bundled
  * with this source code in the file LICENSE.
@@ -63,11 +63,6 @@ class MessageServiceTest extends \PHPUnit_Framework_TestCase
         $this->logger = null;
     }
 
-    public function testCreateMessage()
-    {
-        $this->assertInstanceOf(Message::class, $this->messageService->createMessage());
-    }
-
     public function testSendMessage()
     {
         $message = $this->getMessage();
@@ -84,34 +79,6 @@ class MessageServiceTest extends \PHPUnit_Framework_TestCase
         $this->messageService->sendMessage($message);
 
         $this->assertCount(1, $this->logger->getInfos());
-    }
-
-    public function getSendMessageWithInvalidMessageTests()
-    {
-        return [
-            [new Message()],
-            [new Message('', [self::RECIPIENT_1])],
-            [new Message('  ', [self::RECIPIENT_1])],
-            [new Message(self::MESSAGE_BODY)],
-        ];
-    }
-
-    /**
-     * @dataProvider getSendMessageWithInvalidMessageTests
-     *
-     * @expectedException \InvalidArgumentException
-     */
-    public function testSendMessageWithInvalidMessage(Message $message)
-    {
-        $this->gateway
-            ->expects($this->never())
-            ->method('sendMessage');
-
-        $this->messageLogger
-            ->expects($this->never())
-            ->method('addMessage');
-
-        $this->messageService->sendMessage($message);
     }
 
     /**
@@ -138,10 +105,13 @@ class MessageServiceTest extends \PHPUnit_Framework_TestCase
      */
     private function getMessage()
     {
-        return (new Message())
-            ->setBody(self::MESSAGE_BODY)
-            ->addRecipient(self::RECIPIENT_1)
-            ->addRecipient(self::RECIPIENT_2)
-            ->setSender(self::SENDER);
+        return new Message(
+            self::MESSAGE_BODY,
+            [
+                self::RECIPIENT_1,
+                self::RECIPIENT_2,
+            ],
+            self::SENDER
+        );
     }
 }

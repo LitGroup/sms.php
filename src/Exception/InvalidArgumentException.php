@@ -10,11 +10,10 @@
 
 namespace LitGroup\Sms\Exception;
 
-/**
- * Class GatewayUnavailableException
- *
- * @author Roman Shamritskiy <roman@litgroup.ru>
- */
-class GatewayUnavailableException extends GatewayException
+class InvalidArgumentException extends \InvalidArgumentException
 {
+    public function __construct($message)
+    {
+        parent::__construct($message);
+    }
 }
