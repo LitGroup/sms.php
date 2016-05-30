@@ -5,8 +5,8 @@
     "license": "MIT",
     "authors": [
         {
-            "name": "LitGroup Team",
-            "email": "developers@litgroup.ru"
+            "name": "Roman Shamritskiy",
+            "email": "roman@litgroup.ru"
         }
     ],
     "autoload": {
@@ -21,7 +21,6 @@
     },
     "require": {
         "php": "~5.5|~7.0",
-        "guzzlehttp/guzzle": "~6.0",
         "psr/log": "~1.0"
     },
     "require-dev": {
