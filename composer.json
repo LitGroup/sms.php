@@ -1,6 +1,6 @@
 {
     "name": "litgroup/sms",
-    "description": "Provider neutral short messaging library.",
+    "description": "Provider neutral SMS library.",
     "keywords": ["sms", "short message"],
     "type": "library",
     "license": "MIT",
