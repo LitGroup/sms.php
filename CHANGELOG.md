@@ -51,7 +51,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - `MessageService` logger messages changed.
 
 
-## [v0.2.0] - 2015-12-14
+## [0.2.0] - 2015-12-14
 ### Added
 - Added clarifying exceptions.
 - `MessageService` implements `PSR-3` `LoggerAwareInterface`.
