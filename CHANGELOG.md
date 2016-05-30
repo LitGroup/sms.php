@@ -17,6 +17,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Message will not try to normalize phone number of recipient anymore.
   Number must be presented in the form `+71231234567` or `InvalidArgumentException`
   will be thrown.
+- `LitGroup\Sms\Exception\GatewayException` now extends `\Exception` instead of `\RuntimeException`.
 
 ### Removed
 - Removed class `LitGroup\Sms\Gateway\MockSms\MockSmsGateway`

@@ -15,6 +15,6 @@ namespace LitGroup\Sms\Exception;
  *
  * @author Roman Shamritskiy <roman@litgroup.r u>
  */
-abstract class GatewayException extends \RuntimeException implements SmsExceptionInterface
+abstract class GatewayException extends \Exception implements SmsExceptionInterface
 {
 }
