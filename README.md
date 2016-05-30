@@ -20,7 +20,7 @@ Installation
 ------------
 
 ```
-composer require litgroup/sms=^0.5.0
+composer require litgroup/sms=0.5.*
 ```
 
 
