@@ -11,8 +11,8 @@
 namespace LitGroup\Sms\Exception;
 
 /**
- * Basic interface for LitGroup SMS exceptions.
+ * Basic interface-marker for controllable exceptions of the library.
+ *
+ * @author Roman Shamritskiy <roman@litgroup.ru>
  */
-interface SmsExceptionInterface
-{
-}
+interface ExceptionInterface { /* _ */ }

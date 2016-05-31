@@ -18,6 +18,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   Number must be presented in the form `+71231234567` or `InvalidArgumentException`
   will be thrown.
 - `LitGroup\Sms\Exception\GatewayException` now extends `\Exception` instead of `\RuntimeException`.
+- `SmsExceptionInterface` renamed to `ExceptionInterface`.
 
 ### Removed
 - Removed class `LitGroup\Sms\Gateway\MockSms\MockSmsGateway`
