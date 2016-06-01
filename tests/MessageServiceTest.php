@@ -12,10 +12,9 @@ namespace Tests\LitGroup\Sms;
 
 use LitGroup\Sms\Exception\GatewayException;
 use LitGroup\Sms\Gateway\GatewayInterface;
-use LitGroup\Sms\Logger\MessageLoggerInterface;
 use LitGroup\Sms\Message;
 use LitGroup\Sms\MessageService;
-use Tests\LitGroup\Sms\Log\TestLogger;
+use Tests\LitGroup\Sms\Fixtures\TestLogger;
 
 class MessageServiceTest extends \PHPUnit_Framework_TestCase
 {
@@ -35,11 +34,6 @@ class MessageServiceTest extends \PHPUnit_Framework_TestCase
     private $gateway;
 
     /**
-     * @var MessageLoggerInterface|\PHPUnit_Framework_MockObject_MockObject
-     */
-    private $messageLogger;
-
-    /**
      * @var TestLogger
      */
     private $logger;
@@ -48,10 +42,8 @@ class MessageServiceTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->gateway = $this->getMock(GatewayInterface::class);
-        $this->messageLogger = $this->getMock(MessageLoggerInterface::class);
         $this->logger = new TestLogger();
         $this->messageService = new MessageService($this->gateway);
-        $this->messageService->setMessageLogger($this->messageLogger);
         $this->messageService->setLogger($this->logger);
     }
 
@@ -59,7 +51,6 @@ class MessageServiceTest extends \PHPUnit_Framework_TestCase
     {
         $this->messageService = null;
         $this->gateway = null;
-        $this->messageLogger = null;
         $this->logger = null;
     }
 
@@ -71,10 +62,6 @@ class MessageServiceTest extends \PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('sendMessage')
             ->with($this->identicalTo($message));
-        $this->messageLogger
-            ->expects($this->once())
-            ->method('addMessage')
-            ->with($this->equalTo($message));
 
         $this->messageService->sendMessage($message);
 
@@ -90,10 +77,6 @@ class MessageServiceTest extends \PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('sendMessage')
             ->willThrowException($this->getMockForAbstractClass(GatewayException::class, [], '', false, false));
-
-        $this->messageLogger
-            ->expects($this->never())
-            ->method('addMessage');
 
         $this->messageService->sendMessage($this->getMessage());
 

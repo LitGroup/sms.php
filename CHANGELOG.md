@@ -29,6 +29,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Method `Message::setSender()` was removed. Use constructor's argument instead.
 - Method `MessageServiceInterface::createMessage()` was removed from interface.
 - Method `MessageService::createMessage()` was removed.
+- Method `MessageServiceInterface::setMessageLogger()` was removed.
+- Method `MessageService::setMessageLogger()` was removed.
+- `MessageLoggerInterface`, `MessageLogger`, `NullMessageLogger` were removed.
 
 
 ## [0.5.0] - 2015-12-16

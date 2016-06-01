@@ -16,7 +16,7 @@ use LitGroup\Sms\Exception\GatewayUnavailableException;
 use LitGroup\Sms\Gateway\CascadeGateway;
 use LitGroup\Sms\Gateway\GatewayInterface;
 use LitGroup\Sms\Message;
-use Tests\LitGroup\Sms\Log\TestLogger;
+use Tests\LitGroup\Sms\Fixtures\TestLogger;
 
 class CascadeGatewayTest extends \PHPUnit_Framework_TestCase
 {
