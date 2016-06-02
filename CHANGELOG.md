@@ -11,7 +11,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - This library is independent from providers now. All provider specific
   implementations of `GatewayInterface` were removed.
 - This library does not depend on `guzzlehttp/guzzle` anymore.
-- Copyright was transited to `© Roman Shamritskiy <roman@litgroup.ru>`.
+- Copyright was transited to `(c) Roman Shamritskiy <roman@litgroup.ru>`.
 - `Message` is an immutable value-object now. Setters removed.
 - Arguments `$body` and `$recipients` of `Message::__construct()` are required now.
 - Message will not try to normalize phone number of recipient anymore.
