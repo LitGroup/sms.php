@@ -26,7 +26,7 @@ class CascadeGatewayException extends GatewayException
      */
     public function __construct(array $exceptions)
     {
-        parent::__construct(sprintf('No one gateway is available (%d gateways failed).', count($exceptions)), 0);
+        parent::__construct(sprintf('No one gateway is available (%d gateways failed).', count($exceptions)));
 
         $this->cascadeExceptions = $exceptions;
     }

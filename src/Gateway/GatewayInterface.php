@@ -31,9 +31,6 @@ interface GatewayInterface
      * @return void
      *
      * @throws GatewayException
-     * @throws GatewayErrorResponseException
-     * @throws GatewayTransferException
-     * @throws GatewayUnavailableException
      */
     public function sendMessage(Message $message);
 }

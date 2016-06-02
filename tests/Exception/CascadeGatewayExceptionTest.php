@@ -11,7 +11,7 @@
 namespace Tests\LitGroup\Sms\Exception;
 
 use LitGroup\Sms\Exception\CascadeGatewayException;
-use LitGroup\Sms\Exception\GatewayUnavailableException;
+use LitGroup\Sms\Exception\GatewayException;
 
 class CascadeGatewayExceptionTest extends \PHPUnit_Framework_TestCase
 {
@@ -21,8 +21,8 @@ class CascadeGatewayExceptionTest extends \PHPUnit_Framework_TestCase
     public function testExceptionData()
     {
         $exception = new CascadeGatewayException([
-            $this->getMockForGatewayException(self::STR_A),
-            $this->getMockForGatewayException(self::STR_B)
+        $this->getMockForGatewayException(self::STR_A),
+        $this->getMockForGatewayException(self::STR_B)
         ]);
 
         $this->assertSame('No one gateway is available (2 gateways failed).', $exception->getMessage());
@@ -34,11 +34,11 @@ class CascadeGatewayExceptionTest extends \PHPUnit_Framework_TestCase
     /**
      * @param string $string
      *
-     * @return GatewayUnavailableException|\PHPUnit_Framework_MockObject_MockObject
+     * @return GatewayException|\PHPUnit_Framework_MockObject_MockObject
      */
     private function getMockForGatewayException($string)
     {
-        $mock = $this->getMock(GatewayUnavailableException::class, [], [], '', false, false);
+        $mock = $this->getMock(GatewayException::class, [], [], '', false, false);
         $mock
             ->expects($this->any())
             ->method('__toString')

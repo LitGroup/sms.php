@@ -11,10 +11,20 @@
 namespace LitGroup\Sms\Exception;
 
 /**
- * Class GatewayException
+ * Exception thrown if gateway is a SMS gateway is unavailable or transport problem occurred.
  *
- * @author Roman Shamritskiy <roman@litgroup.r u>
+ * @author Roman Shamritskiy <roman@litgroup.ru>
  */
-abstract class GatewayException extends \Exception implements ExceptionInterface
+class GatewayException extends \Exception implements ExceptionInterface
 {
+    /**
+     * GatewayException constructor.
+     * 
+     * @param string $message
+     * @param \Exception|null $previous
+     */
+    public function __construct($message, \Exception $previous = null)
+    {
+        parent::__construct($message, 0, $previous);
+    }
 }

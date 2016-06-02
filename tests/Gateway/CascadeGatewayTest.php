@@ -12,7 +12,6 @@ namespace Tests\LitGroup\Sms\Gateway;
 
 use LitGroup\Sms\Exception\CascadeGatewayException;
 use LitGroup\Sms\Exception\GatewayException;
-use LitGroup\Sms\Exception\GatewayUnavailableException;
 use LitGroup\Sms\Gateway\CascadeGateway;
 use LitGroup\Sms\Gateway\GatewayInterface;
 use LitGroup\Sms\Message;
@@ -186,6 +185,6 @@ class CascadeGatewayTest extends \PHPUnit_Framework_TestCase
      */
     private function getGatewayException()
     {
-        return new GatewayUnavailableException('Big bang');
+        return new GatewayException('Big bang');
     }
 }

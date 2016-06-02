@@ -19,6 +19,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   will be thrown.
 - `LitGroup\Sms\Exception\GatewayException` now extends `\Exception` instead of `\RuntimeException`.
 - `SmsExceptionInterface` renamed to `ExceptionInterface`.
+- Now `GatewayException` not abstract.
+- Now `Gateway\GatewayInterface::sendMessage()` can throw just `GatewayException` instead of set of subclasses.
 
 ### Removed
 - Removed class `LitGroup\Sms\Gateway\MockSms\MockSmsGateway`
@@ -32,6 +34,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Method `MessageServiceInterface::setMessageLogger()` was removed.
 - Method `MessageService::setMessageLogger()` was removed.
 - `MessageLoggerInterface`, `MessageLogger`, `NullMessageLogger` were removed.
+- `GatewayTransferException` was removed.
+- `GatewayUnavailableException` was removed.
+- `GatewayErrorResponseExcetion` was removed.
 
 
 ## [0.5.0] - 2015-12-16
