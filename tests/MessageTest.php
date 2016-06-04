@@ -23,7 +23,10 @@ class MessageTest extends \PHPUnit_Framework_TestCase
 
     const SENDER = 'Company ltd.';
 
-    public function testConstructMinimal()
+    /**
+     * @test
+     */
+    public function shouldBeConstructedWithBodyAndRecipientsList()
     {
         $msg = new Message(
             self::BODY,
@@ -45,7 +48,10 @@ class MessageTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($msg->getSender());
     }
 
-    public function testConstructWithSender()
+    /**
+     * @test
+     */
+    public function canBeConstructedWithNameOfSender()
     {
         $msg = new Message(self::BODY, [self::RECIPIENT_A], self::SENDER);
         $this->assertSame(self::BODY, $msg->getBody());
@@ -53,61 +59,70 @@ class MessageTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(self::SENDER, $msg->getSender());
     }
 
-    public function testGetLength()
+    /**
+     * @test
+     */
+    public function shouldCalculateLengthOfBodyInCharacters()
     {
         $msg = new Message(self::BODY, [self::RECIPIENT_A]);
         $this->assertSame(self::BODY_LENGTH, $msg->getLength());
     }
 
     /**
+     * @test
      * @expectedException \LitGroup\Sms\Exception\InvalidArgumentException
      */
-    public function testBodyCannotBeNull()
+    public function shouldThrowAnExceptionIfBodyIsNull()
     {
         new Message(null, [self::RECIPIENT_A]);
     }
 
     /**
+     * @test
      * @expectedException \LitGroup\Sms\Exception\InvalidArgumentException
      */
-    public function testBodyMustBeAString()
+    public function shouldThrowAnExceptionIfBodyIsNotAString()
     {
         new Message(new \stdClass(), [self::RECIPIENT_A]);
     }
 
     /**
+     * @test
      * @expectedException \LitGroup\Sms\Exception\InvalidArgumentException
      */
-    public function testBodyCannotBeEmptyString()
+    public function shouldThrowAnExceptionIfBodyIsAnEmptyString()
     {
         new Message('', [self::RECIPIENT_A]);
     }
 
     /**
+     * @test
      * @expectedException \LitGroup\Sms\Exception\InvalidArgumentException
      */
-    public function testListOfRecipientsCannotBeEmpty()
+    public function shouldThrowAnExceptionIfListOfRecipientsIsEmpty()
     {
         new Message(self::BODY, []);
     }
 
     /**
+     * @test
      * @expectedException \LitGroup\Sms\Exception\InvalidArgumentException
      */
-    public function testRecipientCannotBeNull()
+    public function shouldThrowAnExceptionIfAnyOfRecipientsIsNull()
     {
         new Message(self::BODY, [null]);
     }
 
     /**
+     * @test
      * @expectedException \LitGroup\Sms\Exception\InvalidArgumentException
      */
-    public function testRecipientNumberMustBeAString()
+    public function shouldThrowAnExceptionIfAnyOfRecipientsRepresentedByNotAString()
     {
         new Message(self::BODY, [new \stdClass]);
     }
 
-    public function getInvalidRecipientFormatTests()
+    public function getInvalidRecipients()
     {
         return [
             [''],
@@ -120,34 +135,38 @@ class MessageTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider getInvalidRecipientFormatTests
+     * @test
+     * @dataProvider getInvalidRecipients
      * @expectedException \LitGroup\Sms\Exception\InvalidArgumentException
      */
-    public function testInvalidRecipientFormat($recipient)
+    public function shouldThrowAnExceptionIfFormatOfRecipientStringIsInvalid($recipient)
     {
         new Message(self::BODY, [$recipient]);
     }
 
     /**
+     * @test
      * @expectedException \LitGroup\Sms\Exception\InvalidArgumentException
      */
-    public function testSenderMustBeAString()
+    public function shouldThrowAnExceptionIfSenderIsNotAString()
     {
         new Message(self::BODY, [self::RECIPIENT_A], new \stdClass());
     }
 
     /**
+     * @test
      * @expectedException \LitGroup\Sms\Exception\InvalidArgumentException
      */
-    public function testSenderCannotBenEmptyString()
+    public function shouldThrowAnExceptionIfNameOfSenderIsAnEmptyString()
     {
         new Message(self::BODY, [self::RECIPIENT_A], '');
     }
 
     /**
+     * @test
      * @expectedException \LitGroup\Sms\Exception\InvalidArgumentException
      */
-    public function testSenderCannotContainWhitespaceOnlyCharacters()
+    public function shouldThrowAnExceptionIfNameOfSenderContainsWhitespaceCharacterOnly()
     {
         new Message(self::BODY, [self::RECIPIENT_A], '      ');
     }
