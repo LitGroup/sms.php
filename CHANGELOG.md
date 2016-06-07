@@ -23,6 +23,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Now `Gateway\GatewayInterface::sendMessage()` can throw just `GatewayException` instead of set of subclasses.
 - `MessageService` does not check correctness of an instance of `Message` anymore.
   This is the responsibility of `Message`.
+- `MessageService` does not implement `Psr\Log\LoggerAwareInterface`.
+  `LoggerInterface` can be passed via the constructor.
 
 ### Removed
 - Removed class `LitGroup\Sms\Gateway\MockSms\MockSmsGateway`

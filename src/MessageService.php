@@ -12,7 +12,6 @@ namespace LitGroup\Sms;
 
 use LitGroup\Sms\Exception\GatewayException;
 use LitGroup\Sms\Gateway\GatewayInterface;
-use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
@@ -21,7 +20,7 @@ use Psr\Log\NullLogger;
  *
  * @author Roman Shamritskiy <roman@litgroup.ru>
  */
-class MessageService implements MessageServiceInterface, LoggerAwareInterface
+class MessageService implements MessageServiceInterface
 {
     /**
      * @var GatewayInterface
@@ -36,11 +35,12 @@ class MessageService implements MessageServiceInterface, LoggerAwareInterface
 
     /**
      * @param GatewayInterface $gateway
+     * @param LoggerInterface|null $logger
      */
-    public function __construct(GatewayInterface $gateway)
+    public function __construct(GatewayInterface $gateway, LoggerInterface $logger = null)
     {
         $this->gateway = $gateway;
-        $this->setLogger(new NullLogger());
+        $this->setLogger($logger);
     }
 
     /**
@@ -68,10 +68,12 @@ class MessageService implements MessageServiceInterface, LoggerAwareInterface
     }
 
     /**
-     * @inheritDoc
+     * @param LoggerInterface|null $logger
+     *
+     * @return void
      */
-    public function setLogger(LoggerInterface $logger)
+    private function setLogger(LoggerInterface $logger = null)
     {
-        $this->logger = $logger;
+        $this->logger = $logger !== null ? $logger : new NullLogger();
     }
 }

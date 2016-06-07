@@ -38,8 +38,7 @@ class MessageServiceTest extends \PHPUnit_Framework_TestCase
     {
         $this->gateway = $this->getMock(GatewayInterface::class);
         $this->logger = new TestLogger();
-        $this->messageService = new MessageService($this->gateway);
-        $this->messageService->setLogger($this->logger);
+        $this->messageService = new MessageService($this->gateway, $this->logger);
     }
 
     protected function tearDown()
@@ -47,6 +46,18 @@ class MessageServiceTest extends \PHPUnit_Framework_TestCase
         $this->messageService = null;
         $this->gateway = null;
         $this->logger = null;
+    }
+
+    public function canBeConstructedWithoutLogger()
+    {
+        $sms = new MessageService($this->gateway);
+        $message = $this->getMockForMessage();
+        $this->gateway
+            ->expects($this->once())
+            ->method('sendMessage')
+            ->with($this->identicalTo($message));
+
+        $sms->sendMessage($message);
     }
 
     /**
