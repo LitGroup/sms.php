@@ -16,6 +16,8 @@ use LitGroup\Sms\Exception\GatewayException;
  * Interface MessageServiceInterface.
  *
  * @author Roman Shamritskiy <roman@litgroup.ru>
+ *
+ * @api
  */
 interface MessageServiceInterface
 {

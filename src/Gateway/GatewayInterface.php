@@ -17,13 +17,15 @@ use LitGroup\Sms\Message;
  * Interface should be implemented for a some vendor of SMS-gateway.
  *
  * @author Roman Shamritskiy <roman@litgroup.ru>
+ *
+ * @api
  */
 interface GatewayInterface
 {
     /**
      * Sends message.
      *
-     * @param Message $message It is expected that the facility has verified and contains correct information.
+     * @param Message $message
      *
      * @return void
      *

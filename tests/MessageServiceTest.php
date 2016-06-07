@@ -73,7 +73,6 @@ class MessageServiceTest extends \PHPUnit_Framework_TestCase
             ->with($this->identicalTo($message));
 
         $this->messageService->sendMessage($message);
-        $this->assertCount(1, $this->logger->getInfos(), 'Should log information about sent message');
     }
 
     /**

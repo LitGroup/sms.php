@@ -17,6 +17,7 @@ use LitGroup\Sms\Message;
  *
  * @author Roman Shamritskiy <roman@litgroup.ru>
  *
+ * @api
  * @codeCoverageIgnore
  */
 class NullGateway implements GatewayInterface

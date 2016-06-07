@@ -13,7 +13,6 @@ namespace LitGroup\Sms\Gateway;
 use LitGroup\Sms\Exception\CascadeGatewayException;
 use LitGroup\Sms\Exception\GatewayException;
 use LitGroup\Sms\Message;
-use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
@@ -22,12 +21,12 @@ use Psr\Log\NullLogger;
  *
  * @author Roman Shamritskiy <roman@litgroup.ru>
  */
-class CascadeGateway implements GatewayInterface, LoggerAwareInterface
+class CascadeGateway implements GatewayInterface
 {
     /**
      * @var array
      */
-    private $gateways = [];
+    private $gateways;
 
     /**
      * @var LoggerInterface
@@ -35,9 +34,16 @@ class CascadeGateway implements GatewayInterface, LoggerAwareInterface
     private $logger;
 
 
-    public function __construct()
+    /**
+     * CascadeGateway constructor.
+     *
+     * @param array $gateways Map of gateways with name of gateway as key.
+     * @param LoggerInterface|null $logger
+     */
+    public function __construct(array $gateways, LoggerInterface $logger = null)
     {
-        $this->logger = new NullLogger();
+        $this->setGateways($gateways);
+        $this->setLogger($logger);
     }
 
     /**
@@ -74,32 +80,36 @@ class CascadeGateway implements GatewayInterface, LoggerAwareInterface
     }
 
     /**
-     * Adds gateway.
+     * @param array $gateways
      *
-     * @param string           $name    Name of gateway will be used for logging of errors.
-     * @param GatewayInterface $gateway
-     *
-     * @return $this
+     * @return void
      */
-    public function addGateway($name, GatewayInterface $gateway)
+    private function setGateways(array $gateways)
     {
-        $name = strtolower($name);
-        if (array_key_exists($name, $this->gateways)) {
-            throw new \InvalidArgumentException(
-                sprintf('Gateway with name "%s" already registered in a CascadeGateway.', $name)
-            );
+        $this->gateways = [];
+        foreach ($gateways as $name => $gateway) {
+            $this->addGateway($name, $gateway);
         }
-
-        $this->gateways[$name] = $gateway;
-
-        return $this;
     }
 
     /**
-     * @inheritDoc
+     * @param string $name
+     * @param GatewayInterface $gateway
+     *
+     * @return void
      */
-    public function setLogger(LoggerInterface $logger)
+    private function addGateway($name, GatewayInterface $gateway)
     {
-        $this->logger = $logger;
+        $this->gateways[$name] = $gateway;
+    }
+
+    /**
+     * @param LoggerInterface|null $logger
+     *
+     * @return void
+     */
+    private function setLogger(LoggerInterface $logger = null)
+    {
+        $this->logger = $logger !== null ? $logger : new NullLogger();
     }
 }

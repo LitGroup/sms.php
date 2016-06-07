@@ -21,7 +21,6 @@ class CascadeGatewayTest extends \PHPUnit_Framework_TestCase
 {
     const GATEWAY_A = 'gateway-a';
     const GATEWAY_B = 'gateway-b';
-    const GATEWAY_C = 'gateway-c';
 
     /**
      * @var CascadeGateway
@@ -43,21 +42,18 @@ class CascadeGatewayTest extends \PHPUnit_Framework_TestCase
      */
     private $gatewayB;
 
-    /**
-     * @var GatewayInterface|\PHPUnit_Framework_MockObject_MockObject
-     */
-    private $gatewayC;
-
-
     protected function setUp()
     {
         $this->logger = new TestLogger();
-        $this->cascadeGateway = new CascadeGateway();
-        $this->cascadeGateway->setLogger($this->logger);
-        $this->cascadeGateway
-            ->addGateway(self::GATEWAY_A, $this->gatewayA = $this->getMockForGateway())
-            ->addGateway(self::GATEWAY_B, $this->gatewayB = $this->getMockForGateway())
-            ->addGateway(self::GATEWAY_C, $this->gatewayC = $this->getMockForGateway());
+        $this->gatewayA = $this->getMockForGateway();
+        $this->gatewayB = $this->getMockForGateway();
+        $this->cascadeGateway = new CascadeGateway(
+            [
+                self::GATEWAY_A => $this->gatewayA,
+                self::GATEWAY_B => $this->gatewayB
+            ],
+            $this->logger
+        );
     }
 
     protected function tearDown()
@@ -66,12 +62,14 @@ class CascadeGatewayTest extends \PHPUnit_Framework_TestCase
         $this->cascadeGateway = null;
         $this->gatewayA = null;
         $this->gatewayB = null;
-        $this->gatewayC = null;
     }
 
-    public function testSendMessageA()
+    /**
+     * @test
+     */
+    public function shouldSendAMessageViaTheFirstOperableGateway()
     {
-        $message = $this->getMessage();
+        $message = $this->getMockForMessage();
 
         $this->gatewayA
             ->expects($this->once())
@@ -80,16 +78,39 @@ class CascadeGatewayTest extends \PHPUnit_Framework_TestCase
         $this->gatewayB
             ->expects($this->never())
             ->method('sendMessage');
-        $this->gatewayC
-            ->expects($this->never())
-            ->method('sendMessage');
 
         $this->cascadeGateway->sendMessage($message);
     }
 
-    public function testSendMessageB()
+    /**
+     * @test
+     */
+    public function shouldCascadeCallNextGatewayIfPreviousFailed()
     {
-        $message = $this->getMessage();
+        $message = $this->getMockForMessage();
+        $exceptionA = $this->getGatewayException();
+
+        $this->gatewayA
+            ->expects($this->once())
+            ->method('sendMessage')
+            ->with($this->identicalTo($message))
+            ->willThrowException($exceptionA);
+        $this->gatewayB
+            ->expects($this->once())
+            ->method('sendMessage')
+            ->with($this->identicalTo($message));
+
+        $this->cascadeGateway->sendMessage($message);
+
+        $this->assertCount(1, $this->logger->getWarnings(), 'Warning should be logged if some gateway inoperable');
+    }
+
+    /**
+     * @test
+     */
+    public function shouldThrowCascadeGatewayExceptionIfAllGatewaysAreInoperable()
+    {
+        $message = $this->getMockForMessage();
 
         $exceptionA = $this->getGatewayException();
         $exceptionB = $this->getGatewayException();
@@ -104,64 +125,25 @@ class CascadeGatewayTest extends \PHPUnit_Framework_TestCase
             ->method('sendMessage')
             ->with($this->identicalTo($message))
             ->willThrowException($exceptionB);
-        $this->gatewayC
-            ->expects($this->once())
-            ->method('sendMessage');
-
-        $this->cascadeGateway->sendMessage($message);
-
-        $this->assertCount(2, $this->logger->getWarnings());
-    }
-
-    public function testSendMessage_AllGatewaysFailed()
-    {
-        $message = $this->getMessage();
-
-        $exceptionA = $this->getGatewayException();
-        $exceptionB = $this->getGatewayException();
-        $exceptionC = $this->getGatewayException();
-
-        $this->gatewayA
-            ->expects($this->once())
-            ->method('sendMessage')
-            ->with($this->identicalTo($message))
-            ->willThrowException($exceptionA);
-        $this->gatewayB
-            ->expects($this->once())
-            ->method('sendMessage')
-            ->with($this->identicalTo($message))
-            ->willThrowException($exceptionB);
-        $this->gatewayC
-            ->expects($this->once())
-            ->method('sendMessage')
-            ->with($this->identicalTo($message))
-            ->willThrowException($exceptionC);
 
         try {
             $this->cascadeGateway->sendMessage($message);
         } catch (CascadeGatewayException $e) {
-            $this->assertCount(3, $e->getCascadeExceptions());
-            $this->assertArrayHasKey(self::GATEWAY_A, $e->getCascadeExceptions());
-            $this->assertSame($exceptionA, $e->getCascadeExceptions()[self::GATEWAY_A]);
-            $this->assertArrayHasKey(self::GATEWAY_B, $e->getCascadeExceptions());
-            $this->assertSame($exceptionB, $e->getCascadeExceptions()[self::GATEWAY_B]);
-            $this->assertArrayHasKey(self::GATEWAY_C, $e->getCascadeExceptions());
-            $this->assertSame($exceptionC, $e->getCascadeExceptions()[self::GATEWAY_C]);
+            $this->assertCount(2, $this->logger->getWarnings());
 
-            $this->assertCount(3, $this->logger->getWarnings());
+            $this->assertCount(2, $e->getCascadeExceptions());
+            $this->assertSame(
+                [
+                    self::GATEWAY_A => $exceptionA,
+                    self::GATEWAY_B => $exceptionB,
+                ],
+                $e->getCascadeExceptions()
+            );
 
             return;
         }
 
-        $this->fail('CascadeGatewayException should be thrown.');
-    }
-
-    /**
-     * @expectedException \InvalidArgumentException
-     */
-    public function testAddGatewayForDuplicateName()
-    {
-        $this->cascadeGateway->addGateway(self::GATEWAY_A, $this->getMockForGateway());
+        $this->fail('CascadeGatewayException was not thrown');
     }
 
     /**
@@ -175,7 +157,7 @@ class CascadeGatewayTest extends \PHPUnit_Framework_TestCase
     /**
      * @return Message
      */
-    private function getMessage()
+    private function getMockForMessage()
     {
         return $this->getMock(Message::class, [], [], '', false, false);
     }

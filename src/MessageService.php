@@ -19,6 +19,8 @@ use Psr\Log\NullLogger;
  * Default implementation of message service.
  *
  * @author Roman Shamritskiy <roman@litgroup.ru>
+ *
+ * @api
  */
 class MessageService implements MessageServiceInterface
 {
@@ -50,16 +52,8 @@ class MessageService implements MessageServiceInterface
     {
         try {
             $this->gateway->sendMessage($message);
-
-            $this->logger->info('Short message was sent.', [
-                'message' => [
-                    'body'       => $message->getBody(),
-                    'recipients' => $message->getRecipients(),
-                    'sender'     => $message->getSender(),
-                ]
-            ]);
         } catch (GatewayException $e) {
-            $this->logger->alert('SMS Gateway problem occurred.', [
+            $this->logger->alert('Problem with SMS Gateway has occurred.', [
                 'exception' => $e
             ]);
 

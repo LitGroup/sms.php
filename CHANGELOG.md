@@ -25,6 +25,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
   This is the responsibility of `Message`.
 - `MessageService` does not implement `Psr\Log\LoggerAwareInterface`.
   `LoggerInterface` can be passed via the constructor.
+- `CascadeGateway` does not implement `Psr\Log\LoggerAwareInterface`.
+  `LoggerInterface` can be passed via the constructor.
 
 ### Removed
 - Removed class `LitGroup\Sms\Gateway\MockSms\MockSmsGateway`
@@ -41,6 +43,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - `GatewayTransferException` was removed.
 - `GatewayUnavailableException` was removed.
 - `GatewayErrorResponseExcetion` was removed.
+- Method `CascadeGateway::addGateway()` was removed, all gateways must be passed
+  via the constructor.
+- Method `MessageService::sendMessage` does not emit `info`-level log message anymore.
+  Logging of raw messages can be insecure.
 
 
 ## [0.5.0] - 2015-12-16
