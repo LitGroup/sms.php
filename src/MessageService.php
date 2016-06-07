@@ -40,7 +40,7 @@ class MessageService implements MessageServiceInterface, LoggerAwareInterface
     public function __construct(GatewayInterface $gateway)
     {
         $this->gateway = $gateway;
-        $this->logger = new NullLogger();
+        $this->setLogger(new NullLogger());
     }
 
     /**
@@ -51,7 +51,7 @@ class MessageService implements MessageServiceInterface, LoggerAwareInterface
         try {
             $this->gateway->sendMessage($message);
 
-            $this->logger->info('Message (SMS) was sent.', [
+            $this->logger->info('Short message was sent.', [
                 'message' => [
                     'body'       => $message->getBody(),
                     'recipients' => $message->getRecipients(),

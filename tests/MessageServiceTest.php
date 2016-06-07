@@ -18,11 +18,6 @@ use Tests\LitGroup\Sms\Fixtures\TestLogger;
 
 class MessageServiceTest extends \PHPUnit_Framework_TestCase
 {
-    const MESSAGE_BODY = 'How are you?';
-    const RECIPIENT_1 = '+71112223344';
-    const RECIPIENT_2 = '+72223334455';
-    const SENDER = 'LitGroup';
-
     /**
      * @var MessageService
      */
@@ -54,9 +49,12 @@ class MessageServiceTest extends \PHPUnit_Framework_TestCase
         $this->logger = null;
     }
 
-    public function testSendMessage()
+    /**
+     * @test
+     */
+    public function shouldSendAMessageViaTheGateway()
     {
-        $message = $this->getMessage();
+        $message = $this->getMockForMessage();
 
         $this->gateway
             ->expects($this->once())
@@ -64,37 +62,37 @@ class MessageServiceTest extends \PHPUnit_Framework_TestCase
             ->with($this->identicalTo($message));
 
         $this->messageService->sendMessage($message);
-
-        $this->assertCount(1, $this->logger->getInfos());
+        $this->assertCount(1, $this->logger->getInfos(), 'Should log information about sent message');
     }
 
     /**
+     * @test
      * @expectedException \LitGroup\Sms\Exception\GatewayException
      */
-    public function testSendMessage_GatewayThrowsException()
+    public function shouldLogAndRethrowGatewayException()
     {
         $this->gateway
             ->expects($this->once())
             ->method('sendMessage')
-            ->willThrowException($this->getMockForAbstractClass(GatewayException::class, [], '', false, false));
+            ->willThrowException($this->getMockForGatewayException());
 
-        $this->messageService->sendMessage($this->getMessage());
-
-        $this->assertCount(1, $this->logger->getAlerts());
+        $this->messageService->sendMessage($this->getMockForMessage());
+        $this->assertCount(1, $this->logger->getAlerts(), 'Should log alert if gateway throws an exception');
     }
 
     /**
      * @return Message
      */
-    private function getMessage()
+    private function getMockForMessage()
     {
-        return new Message(
-            self::MESSAGE_BODY,
-            [
-                self::RECIPIENT_1,
-                self::RECIPIENT_2,
-            ],
-            self::SENDER
-        );
+        return $this->getMock(Message::class, [], [], '', false, false);
+    }
+
+    /**
+     * @return GatewayException
+     */
+    private function getMockForGatewayException()
+    {
+        return $this->getMockForAbstractClass(GatewayException::class, [], '', false, false);
     }
 }
