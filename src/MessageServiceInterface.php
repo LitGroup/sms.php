@@ -26,8 +26,7 @@ interface MessageServiceInterface
      *
      * @return void
      *
-     * @throws GatewayException          If gateway problem occurred.
-     * @throws \InvalidArgumentException If required message fields are not fully filled.
+     * @throws GatewayException          If a gateway problem occurred.
      */
     public function sendMessage(Message $message);
 }

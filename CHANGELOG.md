@@ -21,6 +21,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - `SmsExceptionInterface` renamed to `ExceptionInterface`.
 - Now `GatewayException` not abstract.
 - Now `Gateway\GatewayInterface::sendMessage()` can throw just `GatewayException` instead of set of subclasses.
+- `MessageService` does not check correctness of an instance of `Message` anymore.
+  This is the responsibility of `Message`.
 
 ### Removed
 - Removed class `LitGroup\Sms\Gateway\MockSms\MockSmsGateway`

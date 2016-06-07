@@ -10,10 +10,7 @@
 
 namespace LitGroup\Sms\Gateway;
 
-use LitGroup\Sms\Exception\GatewayErrorResponseException;
 use LitGroup\Sms\Exception\GatewayException;
-use LitGroup\Sms\Exception\GatewayTransferException;
-use LitGroup\Sms\Exception\GatewayUnavailableException;
 use LitGroup\Sms\Message;
 
 /**
