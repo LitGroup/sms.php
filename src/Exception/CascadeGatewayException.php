@@ -22,12 +22,16 @@ class CascadeGatewayException extends GatewayException
     /**
      * CascadeGatewayException constructor.
      *
-     * @param array $exceptions ['gateway_name' => $exception]
+     * @param array $exceptions Map with names of gateways as keys and exceptions as values.
      */
     public function __construct(array $exceptions)
     {
-        parent::__construct(sprintf('No one gateway is available (%d gateways failed).', count($exceptions)));
-
+        parent::__construct(
+            sprintf(
+                'All SMS gateways are inoperative (%d gateways total).',
+                count($exceptions)
+            )
+        );
         $this->cascadeExceptions = $exceptions;
     }
 
@@ -46,15 +50,28 @@ class CascadeGatewayException extends GatewayException
      */
     public function __toString()
     {
-        $lines = [];
+        $lines = [
+            parent::__toString()
+        ];
 
         foreach ($this->cascadeExceptions as $gatewayName => $exception) {
             array_push(
                 $lines,
-                sprintf("### Gateway %s:\n\n%s", $gatewayName, (string) $exception)
+                $this->formatInnerException($gatewayName, $exception)
             );
         }
 
-        return implode("\n\n\n", $lines);
+        return implode("\n\n", $lines);
+    }
+
+    /**
+     * @param string $gatewayName
+     * @param GatewayException $exception
+     *
+     * @return string
+     */
+    private function formatInnerException($gatewayName, GatewayException $exception)
+    {
+        return sprintf("==> \"Gateway %s:\"\n%s", $gatewayName, (string) $exception);
     }
 }

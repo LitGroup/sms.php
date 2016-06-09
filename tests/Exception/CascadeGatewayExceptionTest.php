@@ -18,14 +18,17 @@ class CascadeGatewayExceptionTest extends \PHPUnit_Framework_TestCase
     const STR_A = 'String A';
     const STR_B = 'String B';
 
-    public function testExceptionData()
+    /**
+     * @test
+     */
+    public function shouldContainInformationAboutAllExceptionsInACascade()
     {
         $exception = new CascadeGatewayException([
-        $this->getMockForGatewayException(self::STR_A),
-        $this->getMockForGatewayException(self::STR_B)
+            $this->getMockForGatewayException(self::STR_A),
+            $this->getMockForGatewayException(self::STR_B)
         ]);
 
-        $this->assertSame('No one gateway is available (2 gateways failed).', $exception->getMessage());
+        $this->assertSame('All SMS gateways are inoperative (2 gateways total).', $exception->getMessage());
         $this->assertCount(2, $exception->getCascadeExceptions());
         $this->assertSame(1, substr_count((string) $exception, self::STR_A));
         $this->assertSame(1, substr_count((string) $exception, self::STR_B));
