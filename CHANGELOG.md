@@ -9,6 +9,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Interface `MessageServiceInterface` was renamed to `SmsInterface`.
 - Class `MessageService` was renamed to `Sms`.
 
+### Removed
+- Interface `Exception\ExceptionInterface` was removed.
+
 
 ## [v0.6.0] – 2016-06-14
 ### Added
