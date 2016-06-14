@@ -5,8 +5,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 
 ## [Unreleased]
-
-### Added `SmsException` to be thrown on `SmsInterface` exceptions.
+### Added
+- `SmsException` to be thrown on `SmsInterface` exceptions.
 
 ### Changed
 - Interface `MessageServiceInterface` was renamed to `SmsInterface`.

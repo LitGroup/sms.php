@@ -103,7 +103,6 @@ class SmsTest extends \PHPUnit_Framework_TestCase
         }
 
         $this->fail('SmsException should be thrown');
-
     }
 
     /**
