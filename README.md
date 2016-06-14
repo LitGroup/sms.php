@@ -10,17 +10,11 @@ SMS
 [![Build Status](https://travis-ci.org/LitGroup/sms.php.svg?branch=master)](https://travis-ci.org/LitGroup/sms.php)
 
 
-Available gateway services
---------------------------
-
-* `SmscGateway` — https://smsc.ru
-
-
 Installation
 ------------
 
 ```
-composer require litgroup/sms=0.5.*
+composer require litgroup/sms=0.6.*
 ```
 
 
@@ -32,53 +26,45 @@ Example of usage
 ```php
 use LitGroup\Sms\Message;
 use LitGroup\Sms\MessageService;
-use LitGroup\Sms\Gateway\Smsc\SmscGateway;
-use GuzzleHttp\Client as HttpClient;
+use LitGroup\Sms\Exception\GatewayException;
 
-// SMSC.ru gateway used for example. But any other gateway, can be used.
-// GatewayInterface must be implemented.
-$gateway = new SmscGateway('mylogin', 'mypassword', new HttpClient());
+// Some implementation of `LitGroup\Sms\Gateway\GatewayInterface`
+$gateway = new SomeGateway();
 
-// Create MessageService.
+// Create Short Message Service
 $messageService = new MessageService($gateway);
 
-// Create some message.
-$message = new Message();
-$message
-    ->setBody('Hello!!!')
-    ->addRecipient('+71232223344')
-    ->setSender('MyCompany');
-    
-// Send a message.
-$messageService->sendMessage($message);
-
+// Create and send some message.
+try {
+    $messageService->sendMessage(
+        'Hello, customer!',
+        ['+79991234567'],
+        'AcmeCompany'
+    );
+} catch (GatewayException $e) {
+    // ...
+}
 ```
 
 
-### Message logging
+### Cascade of gateways
 
-All sent messages can be logged. You can implement own custom logger which can store all sent messages in a database.
-Logger must implement `LitGroup\Sms\Logger\MessageLoggerInterface` and must be injected into the message service
-by calling `MessageServiceInterface::setMessageLogger()`.
-
-Package provides default implementation `LitGroup\Sms\Logger\MessageLogger` which can be used for testing purposes.
-
-**Example:**
+It's possible to use cascade of gateways of several providers to improve
+fault-tolerance. Use `LitGroup\Sms\Gateway\CascadeGateway`.
 
 ```php
-use LitGroup\Sms\Logging\MessageLogger;
-// ...
+$cascadeGateway = new CascadeGateway([
+    new AGateway(),
+    new BGateway(),
+]);
 
-$logger = new MessageLogger();
-
-/** @var MessageService $messageService */
-$messageService->setMessageLogger($logger);
-
-// Sending of messages...
-
-// Get all sent messages:
-$logger->getMessages();
-
-// Get number of sent messages:
-$logger->count();
+$messageService = new MessageService($cascadeGateway);
 ```
+
+
+### Logging of exceptions
+
+Constructor of `MessageService` receives `Psr\Log\LoggerInterface`.
+
+If you use `CascadeGateway` then inject a logger into the instance of
+`CascadeGateway` too. `Warnings` will be logged if some of gateways are inoperative.
