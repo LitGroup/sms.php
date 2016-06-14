@@ -9,6 +9,7 @@ SMS
 [![Downloads](https://img.shields.io/packagist/dt/litgroup/sms.svg)](https://packagist.org/packages/litgroup/sms)
 [![Build Status](https://travis-ci.org/LitGroup/sms.php.svg?branch=master)](https://travis-ci.org/LitGroup/sms.php)
 
+Read the documentation for the last release [here][currentdoc].
 
 Installation
 ------------
@@ -26,7 +27,7 @@ Example of usage
 ```php
 use LitGroup\Sms\Message;
 use LitGroup\Sms\MessageService;
-use LitGroup\Sms\Exception\GatewayException;
+use LitGroup\Sms\Exception\SmsException;
 
 // Some implementation of `LitGroup\Sms\Gateway\GatewayInterface`
 $gateway = new SomeGateway();
@@ -41,13 +42,13 @@ try {
         ['+79991234567'],
         'AcmeCompany'
     );
-} catch (GatewayException $e) {
+} catch (SmsException $e) {
     // ...
 }
 ```
 
 
-### Cascade of gateways
+### Use cascade of gateways
 
 It's possible to use cascade of gateways of several providers to improve
 fault-tolerance. Use `LitGroup\Sms\Gateway\CascadeGateway`.
@@ -64,7 +65,9 @@ $messageService = new MessageService($cascadeGateway);
 
 ### Logging of exceptions
 
-Constructor of `MessageService` receives `Psr\Log\LoggerInterface`.
+- Constructor of `MessageService` receives `Psr\Log\LoggerInterface`.
+- If you use `CascadeGateway` then inject a logger into the instance of
+  `CascadeGateway` too. `Warnings` will be logged if some of gateways are inoperative.
 
-If you use `CascadeGateway` then inject a logger into the instance of
-`CascadeGateway` too. `Warnings` will be logged if some of gateways are inoperative.
+
+[currentdoc]: https://github.com/LitGroup/sms.php/blob/v0.6.0/README.md
