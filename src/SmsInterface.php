@@ -19,7 +19,7 @@ use LitGroup\Sms\Exception\GatewayException;
  *
  * @api
  */
-interface MessageServiceInterface
+interface SmsInterface
 {
     /**
      * Sends single message.

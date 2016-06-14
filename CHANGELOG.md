@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+
+## [Unreleased]
+### Changed
+- Interface `MessageServiceInterface` was renamed to `SmsInterface`.
+- Class `MessageService` was renamed to `Sms`.
+
+
 ## [v0.6.0] – 2016-06-14
 ### Added
 - `LitGroup\Sms\Exception\InvalidArgumentException`
@@ -58,6 +65,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - Added `MessageLoggerInterface`.
 - [BC] `MessageServiceInterface::setMessageLogger` was added.
+
 
 ## [0.3.0] - 2015-12-15
 ### Added

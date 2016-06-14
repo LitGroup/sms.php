@@ -22,7 +22,7 @@ use Psr\Log\NullLogger;
  *
  * @api
  */
-class MessageService implements MessageServiceInterface
+class Sms implements SmsInterface
 {
     /**
      * @var GatewayInterface

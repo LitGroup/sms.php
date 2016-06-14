@@ -13,13 +13,13 @@ namespace Tests\LitGroup\Sms;
 use LitGroup\Sms\Exception\GatewayException;
 use LitGroup\Sms\Gateway\GatewayInterface;
 use LitGroup\Sms\Message;
-use LitGroup\Sms\MessageService;
+use LitGroup\Sms\Sms;
 use Tests\LitGroup\Sms\Fixtures\TestLogger;
 
-class MessageServiceTest extends \PHPUnit_Framework_TestCase
+class SmsTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var MessageService
+     * @var Sms
      */
     private $messageService;
 
@@ -38,7 +38,7 @@ class MessageServiceTest extends \PHPUnit_Framework_TestCase
     {
         $this->gateway = $this->getMock(GatewayInterface::class);
         $this->logger = new TestLogger();
-        $this->messageService = new MessageService($this->gateway, $this->logger);
+        $this->messageService = new Sms($this->gateway, $this->logger);
     }
 
     protected function tearDown()
@@ -50,7 +50,7 @@ class MessageServiceTest extends \PHPUnit_Framework_TestCase
 
     public function canBeConstructedWithoutLogger()
     {
-        $sms = new MessageService($this->gateway);
+        $sms = new Sms($this->gateway);
         $message = $this->getMockForMessage();
         $this->gateway
             ->expects($this->once())
