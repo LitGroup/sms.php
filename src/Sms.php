@@ -17,7 +17,7 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
 /**
- * Default implementation of message service.
+ * Default implementation of short message service.
  *
  * @author Roman Shamritskiy <roman@litgroup.ru>
  *
