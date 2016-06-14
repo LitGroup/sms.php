@@ -11,6 +11,7 @@
 namespace Tests\LitGroup\Sms;
 
 use LitGroup\Sms\Exception\GatewayException;
+use LitGroup\Sms\Exception\SmsException;
 use LitGroup\Sms\Gateway\GatewayInterface;
 use LitGroup\Sms\Message;
 use LitGroup\Sms\Sms;
@@ -55,7 +56,8 @@ class SmsTest extends \PHPUnit_Framework_TestCase
         $this->gateway
             ->expects($this->once())
             ->method('sendMessage')
-            ->with($this->identicalTo($message));
+            ->with($this->identicalTo($message))
+        ;
 
         $sms->sendMessage($message);
     }
@@ -70,24 +72,38 @@ class SmsTest extends \PHPUnit_Framework_TestCase
         $this->gateway
             ->expects($this->once())
             ->method('sendMessage')
-            ->with($this->identicalTo($message));
+            ->with($this->identicalTo($message))
+        ;
 
         $this->messageService->sendMessage($message);
     }
 
     /**
      * @test
-     * @expectedException \LitGroup\Sms\Exception\GatewayException
      */
-    public function shouldLogAndRethrowGatewayException()
+    public function shouldThrowSmsExceptionIfGatewayProblemOccurred()
     {
+        $gatewayException = $this->getMockForGatewayException();
         $this->gateway
             ->expects($this->once())
             ->method('sendMessage')
-            ->willThrowException($this->getMockForGatewayException());
+            ->willThrowException($gatewayException)
+        ;
 
-        $this->messageService->sendMessage($this->getMockForMessage());
-        $this->assertCount(1, $this->logger->getAlerts(), 'Should log alert if gateway throws an exception');
+        try {
+            $this->messageService->sendMessage($this->getMockForMessage());
+        } catch (SmsException $e) {
+            $this->assertSame($gatewayException, $e->getPrevious(), 'GatewayException must be attached');
+            // Check log:
+            $logEntry = $this->logger->getAlerts()[0];
+            $this->assertSame('Problem with SMS Gateway has occurred.', $logEntry['message']);
+            $this->assertSame($gatewayException, $logEntry['context']['exception']);
+
+            return;
+        }
+
+        $this->fail('SmsException should be thrown');
+
     }
 
     /**

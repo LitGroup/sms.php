@@ -10,7 +10,7 @@
 
 namespace LitGroup\Sms;
 
-use LitGroup\Sms\Exception\GatewayException;
+use LitGroup\Sms\Exception\SmsException;
 
 /**
  * Interface MessageServiceInterface.
@@ -28,7 +28,7 @@ interface SmsInterface
      *
      * @return void
      *
-     * @throws GatewayException          If a gateway problem occurred.
+     * @throws SmsException If message cannot be sent.
      */
     public function sendMessage(Message $message);
 }

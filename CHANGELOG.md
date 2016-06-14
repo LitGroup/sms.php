@@ -5,9 +5,13 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 
 ## [Unreleased]
+
+### Added `SmsException` to be thrown on `SmsInterface` exceptions.
+
 ### Changed
 - Interface `MessageServiceInterface` was renamed to `SmsInterface`.
 - Class `MessageService` was renamed to `Sms`.
+- `SmsInterface::sendMessage()` now throws `SmsException` instead of `GatewayException`.
 
 ### Removed
 - Interface `Exception\ExceptionInterface` was removed.
