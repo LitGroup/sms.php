@@ -49,6 +49,9 @@ class SmsTest extends \PHPUnit_Framework_TestCase
         $this->logger = null;
     }
 
+    /**
+     * @test
+     */
     public function canBeConstructedWithoutLogger()
     {
         $sms = new Sms($this->gateway);
