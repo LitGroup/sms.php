@@ -12,7 +12,7 @@
 
     <testsuites>
         <testsuite name="litgroup/sms">
-            <directory suffix="Test.php">tests</directory>
+            <directory suffix="Test.php">test</directory>
         </testsuite>
     </testsuites>
 

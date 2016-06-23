@@ -8,7 +8,7 @@
  * with this source code in the file LICENSE.
  */
 
-namespace Tests\LitGroup\Sms\Exception\Exception;
+namespace Test\LitGroup\Sms\Exception\Exception;
 
 use LitGroup\Sms\Exception\SmsException;
 

@@ -8,7 +8,7 @@
  * with this source code in the file LICENSE.
  */
 
-namespace Tests\LitGroup\Sms;
+namespace Test\LitGroup\Sms;
 
 use LitGroup\Sms\Message;
 

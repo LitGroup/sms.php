@@ -8,14 +8,14 @@
  * with this source code in the file LICENSE.
  */
 
-namespace Tests\LitGroup\Sms\Gateway;
+namespace Test\LitGroup\Sms\Gateway;
 
 use LitGroup\Sms\Exception\CascadeGatewayException;
 use LitGroup\Sms\Exception\GatewayException;
 use LitGroup\Sms\Gateway\CascadeGateway;
 use LitGroup\Sms\Gateway\GatewayInterface;
 use LitGroup\Sms\Message;
-use Tests\LitGroup\Sms\Fixtures\TestLogger;
+use Test\LitGroup\Sms\Fixtures\TestLogger;
 
 class CascadeGatewayTest extends \PHPUnit_Framework_TestCase
 {

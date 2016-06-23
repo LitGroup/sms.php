@@ -8,7 +8,7 @@
  * with this source code in the file LICENSE.
  */
 
-namespace Tests\LitGroup\Sms\Exception;
+namespace Test\LitGroup\Sms\Exception;
 
 use LitGroup\Sms\Exception\CascadeGatewayException;
 use LitGroup\Sms\Exception\GatewayException;

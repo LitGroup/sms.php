@@ -8,7 +8,7 @@
  * with this source code in the file LICENSE.
  */
 
-namespace Tests\LitGroup\Sms\Fixtures;
+namespace Test\LitGroup\Sms\Fixtures;
 
 use Psr\Log\AbstractLogger;
 use Psr\Log\LogLevel;

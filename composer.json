@@ -17,7 +17,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Tests\\LitGroup\\Sms\\": "tests/"
+            "Test\\LitGroup\\Sms\\": "test/"
         }
     },
     "require": {

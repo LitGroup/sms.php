@@ -8,14 +8,14 @@
  * with this source code in the file LICENSE.
  */
 
-namespace Tests\LitGroup\Sms;
+namespace Test\LitGroup\Sms;
 
 use LitGroup\Sms\Exception\GatewayException;
 use LitGroup\Sms\Exception\SmsException;
 use LitGroup\Sms\Gateway\GatewayInterface;
 use LitGroup\Sms\Message;
 use LitGroup\Sms\Sms;
-use Tests\LitGroup\Sms\Fixtures\TestLogger;
+use Test\LitGroup\Sms\Fixtures\TestLogger;
 
 class SmsTest extends \PHPUnit_Framework_TestCase
 {
