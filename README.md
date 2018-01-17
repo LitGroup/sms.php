@@ -1,6 +1,8 @@
 SMS
 ===
 
+🚫 This project is no longer maintained.
+
 > Provider neutral SMS library for PHP 5.5+
 
 [![Version](https://img.shields.io/packagist/v/litgroup/sms.svg)](https://packagist.org/packages/litgroup/sms)
